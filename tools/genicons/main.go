@@ -11,6 +11,7 @@
 //	frontend/src/assets/icons/<name>.png    one glyph per master, cropped to its ink
 //	frontend/src/assets/donate.png          the donate mark, cropped and scaled by height
 //	docs/icon.png                           256, the project site's icon
+//	build/linux/icons/webvigil_<size>.png   the hicolor set build_flatpak.sh installs (gitignored)
 //
 // Glyphs are cropped to their visible pixels and scaled to a common ink height, so a master drawn
 // with a wide transparent margin renders at the same size as one drawn edge to edge.
@@ -59,6 +60,12 @@ const (
 
 var icoSizes = []int{16, 20, 24, 32, 40, 48, 64, 128, 256}
 
+// hicolorSizes are the freedesktop icon theme sizes the flatpak installs, one file each under
+// build/linux/icons; build_flatpak.sh names the same list when it installs them.
+var hicolorSizes = []int{16, 24, 32, 48, 64, 128, 256, 512}
+
+const hicolorDir, hicolorFormat = "build/linux/icons", "webvigil_%d.png"
+
 func main() {
 	if err := run(); err != nil {
 		fmt.Fprintln(os.Stderr, "genicons:", err)
@@ -93,6 +100,11 @@ func run() error {
 	if err := writePNG(siteIconFile, resize(square, siteIconSize)); err != nil {
 		return err
 	}
+	for _, size := range hicolorSizes {
+		if err := writePNG(filepath.Join(hicolorDir, fmt.Sprintf(hicolorFormat, size)), resize(square, size)); err != nil {
+			return err
+		}
+	}
 	count, err := writeGlyphs()
 	if err != nil {
 		return err
@@ -113,7 +125,7 @@ func run() error {
 			return err
 		}
 	}
-	fmt.Println("genicons: wrote app icons, both ICOs, the setup mark and", count, "glyphs")
+	fmt.Println("genicons: wrote app icons, both ICOs, the setup mark, the hicolor set and", count, "glyphs")
 	return nil
 }
 

@@ -1,0 +1,2 @@
+# Shell scripts run on macOS and Linux; keep them LF regardless of the Windows checkout's core.autocrlf.
+*.sh text eol=lf
