@@ -17,6 +17,10 @@ Set-Location $root
 $version = (Get-Content (Join-Path $root 'VERSION')).Trim()
 Write-Host "Building WebVigil $version"
 
+# The site cannot read VERSION, so its version tokens are stamped from it before anything else.
+python (Join-Path $root 'stamp_version.py')
+if ($LASTEXITCODE -ne 0) { throw "stamp_version.py failed with exit code $LASTEXITCODE" }
+
 # The repository that publishes the releases, read from this checkout's own git remote so the
 # source names no account. The update check asks its latest release; without one it reports
 # every check as unreachable rather than asking the wrong project.

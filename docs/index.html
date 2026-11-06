@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WebVigil: watch the web, know what changes</title>
+    <meta name="description" content="WebVigil checks the web pages you choose, tells you when their meaningful content changes and says plainly why a check failed. Local, deterministic, free. For Windows.">
+    <meta name="theme-color" content="#061229">
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="WebVigil: watch the web, know what changes">
+    <meta property="og:description" content="Checks the pages you choose, shows exactly what changed and says why a check failed. Everything stays on your computer. For Windows.">
+    <meta property="og:image" content="https://ernster.dev/WebVigil/icon.png">
+    <meta property="og:url" content="https://ernster.dev/WebVigil/">
+    <link rel="canonical" href="https://ernster.dev/WebVigil/">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta property="og:site_name" content="WebVigil">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="256">
+    <meta property="og:image:height" content="256">
+    <meta property="og:image:alt" content="WebVigil app icon">
+    <meta property="og:locale" content="en_GB">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="WebVigil: watch the web, know what changes">
+    <meta name="twitter:description" content="Checks the pages you choose, shows exactly what changed and says why a check failed. Everything stays on your computer. For Windows.">
+    <meta name="twitter:image" content="https://ernster.dev/WebVigil/icon.png">
+    <meta name="twitter:image:alt" content="WebVigil app icon">
+    <link rel="stylesheet" href="styles.css">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "WebVigil",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "Windows",
+        "description": "Checks the web pages you choose and tells you when their meaningful content changes.",
+        "author": {"@type": "Person", "name": "Oliver Ernster", "url": "https://ernster.dev"},
+        "license": "https://www.gnu.org/licenses/gpl-3.0.html",
+        "downloadUrl": "https://github.com/oernster/WebVigil/releases/latest",
+        "offers": {"@type": "Offer", "price": "0", "priceCurrency": "GBP"}
+    }
+    </script>
+<script>window.goatcounter = {path: function (p) { return location.host + p }}</script>
+<script data-goatcounter="https://oernster.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+
+<header class="wrap site-head">
+    <a class="brand" href="#top"><img src="icon.png" alt="" width="34" height="34"> WebVigil</a>
+    <nav aria-label="Sections">
+        <a href="#how" class="hide-sm">How it works</a>
+        <a href="#features" class="hide-sm">Features</a>
+        <a href="#download">Download</a>
+        <a href="https://github.com/oernster/WebVigil">GitHub</a>
+    </nav>
+</header>
+
+<main id="top">
+
+    <div class="wrap hero">
+        <p class="eyebrow">
+            <span class="pill">v<!--VERSION-->0.1.0<!--/VERSION--></span>
+            <span class="pill">Windows</span>
+            <span class="pill">Free and open source</span>
+        </p>
+        <h1>Watch the web. <span class="accent">Know what changes.</span></h1>
+        <p class="lead">WebVigil checks the pages you choose on your schedule. It tells you
+            when their <strong>meaningful content</strong> changes: exactly what changed, line
+            by line. When a check fails it says why, in words you can act on, instead of
+            showing you an old page as if nothing were wrong.</p>
+        <div class="cta">
+            <a class="btn btn-primary" href="#download">Download for Windows</a>
+            <a class="btn" href="https://github.com/oernster/WebVigil">View the source</a>
+        </div>
+        <figure class="shot shot-hero">
+            <img src="screenshots/main-ui.png" width="1264" height="749"
+                alt="The WebVigil window: the toolbar, the list of watched sites with one healthy site selected and its status details below.">
+        </figure>
+    </div>
+
+    <section class="wrap" id="why">
+        <p class="kicker">Why it exists</p>
+        <h2>Stop reopening the same page to see whether anything moved.</h2>
+        <div class="prose">
+            <p>A price, a stock notice, a policy page, a release list, a timetable: some pages
+                matter only when they change; the only way to find out is to keep looking.
+                WebVigil does the looking. It reads each page, compares what it found with the
+                last version it accepted and stays quiet until there is something to say.</p>
+            <p>It is <strong>deterministic</strong>: a change is a difference in the content you
+                chose to watch, found by comparison and never by guesswork. It is
+                <strong>local</strong>: your sites, their snapshots and their history live on your
+                computer and nowhere else.</p>
+        </div>
+    </section>
+
+    <section class="wrap" id="how">
+        <p class="kicker">How it works</p>
+        <h2>Choose what to read. WebVigil does the rest.</h2>
+        <div class="how">
+            <ol class="steps">
+                <li><strong>Add a page</strong> and choose what counts: its visible text, the
+                    text of chosen CSS selectors, a set of named fields or the raw response.
+                    Exclude adverts, counters and timestamps with selectors and patterns.
+                    <em>Preview extraction</em> shows exactly what will be compared before you
+                    save.</li>
+                <li><strong>WebVigil checks it</strong> on its own interval, five minutes at the
+                    shortest. The first successful check becomes the baseline and raises
+                    nothing.</li>
+                <li><strong>A change raises your alarm</strong>: a chime or your own sound, a
+                    Windows notification, either or both. The site turns amber and waits for you
+                    to acknowledge it, with the change shown as a line diff.</li>
+                <li><strong>A failure is named</strong>: DNS, a refused or timed-out connection,
+                    TLS, the HTTP status, a missing selector, a challenge page. It never hides a
+                    change still waiting.</li>
+            </ol>
+            <figure class="shot">
+                <img src="screenshots/edit-site.png" width="757" height="601"
+                    alt="The Edit dialog: name, address, interval, timeout, detection mode, ignore rules and the notification choices for one site.">
+                <figcaption>Every site carries its own interval, detection mode, ignore rules and
+                    alarm choices.</figcaption>
+            </figure>
+        </div>
+    </section>
+
+    <section class="wrap" id="lights">
+        <p class="kicker">At a glance</p>
+        <h2>Four lights, each told by shape and word as well as colour.</h2>
+        <div class="lights">
+            <div class="light-card"><span class="mark ring" aria-hidden="true"></span>
+                <h3>Pending</h3><p>No successful baseline yet.</p></div>
+            <div class="light-card"><span class="mark circle" aria-hidden="true"></span>
+                <h3>Healthy</h3><p>Checked and compared; nothing new.</p></div>
+            <div class="light-card"><span class="mark diamond" aria-hidden="true"></span>
+                <h3>Changed</h3><p>A change awaits acknowledgement.</p></div>
+            <div class="light-card"><span class="mark square" aria-hidden="true"></span>
+                <h3>Failed</h3><p>The latest check failed, with the reason shown.</p></div>
+        </div>
+    </section>
+
+    <section class="wrap" id="features">
+        <p class="kicker">The feature list</p>
+        <h2>What it does. What it deliberately does not.</h2>
+        <div class="two-col">
+            <div class="card">
+                <h3>What it does</h3>
+                <ul>
+                    <li><strong>Ignores what does not matter.</strong> Excluded selectors and
+                        text patterns are removed before comparison; whitespace can be collapsed
+                        and case folded.</li>
+                    <li><strong>Checks politely.</strong> At most four checks at once, one host
+                        never asked twice within ten seconds, conditional requests when nothing
+                        changed and a back-off up to a day while a site keeps failing.</li>
+                    <li><strong>Keeps the history.</strong> Every check with its outcome and
+                        status; every change as a line diff or a list of changed fields.</li>
+                    <li><strong>Imports and exports</strong> site definitions as JSON, previewed
+                        first, with a site you already watch skipped unless you say otherwise.</li>
+                    <li><strong>Lives in the tray.</strong> Close the window and monitoring
+                        carries on; it can start when you sign in to Windows.</li>
+                    <li><strong>Explains itself.</strong> A Guide to every control and rule, light
+                        and dark appearance and a check for new versions.</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>What it does not do</h3>
+                <ul>
+                    <li><strong>Run a page's JavaScript.</strong> It reads the HTML the server
+                        sends; a page that is empty until script runs is reported, not worked
+                        around.</li>
+                    <li><strong>Log in.</strong> No passwords, cookies or sessions are stored.</li>
+                    <li><strong>Get past CAPTCHAs.</strong> A challenge page is recognised and
+                        reported; it is never solved or disguised against.</li>
+                    <li><strong>Use AI.</strong> Changes are found by comparison, never by
+                        interpretation.</li>
+                    <li><strong>Phone home.</strong> No telemetry and no accounts. Beyond the
+                        pages you watch, its one request asks GitHub for its latest release,
+                        carrying no identifier and nothing about your sites.</li>
+                    <li><strong>Run on macOS or Linux.</strong> Windows only.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="wrap" id="download">
+        <p class="kicker">Download</p>
+        <h2>Install it once. Stop refreshing.</h2>
+        <span class="dl-version" id="dl-version">Version <!--VERSION-->0.1.0<!--/VERSION--></span>
+        <!--
+            The button points at GitHub's releases/latest/download redirect, which always
+            serves the newest release's file. The name carries no version, so the link
+            cannot go stale. The script at the foot adds the file size when it can reach
+            the API; without it the page still says everything that matters.
+        -->
+        <div class="downloads">
+            <div class="dl-card">
+                <div class="ico"><img src="icon.png" alt="" width="48" height="48"></div>
+                <h3>Windows</h3>
+                <p class="req">Windows 10 or 11 on x64, with the Microsoft WebView2 runtime</p>
+                <a class="btn btn-primary" href="https://github.com/oernster/WebVigil/releases/latest/download/WebVigilSetup.exe">Download for Windows</a>
+                <p class="meta" data-asset="WebVigilSetup.exe">Setup program (.exe)</p>
+                <p class="meta">Windows may show a SmartScreen warning when you run
+                    it: <a href="https://ernster.dev/windows-smartscreen.html">here is why</a>.</p>
+                <p class="how-to">Run it and choose Install. It installs for your account only,
+                    so Windows never asks for administrator rights. Running it again offers
+                    Update, Go back or Repair, with Uninstall beside each; uninstalling keeps
+                    your websites and history unless you ask for them to be deleted.</p>
+            </div>
+        </div>
+        <p class="dl-links">
+            <a id="dl-whats-new" href="https://github.com/oernster/WebVigil/releases/latest">What is new in this release</a>
+            &nbsp;&middot;&nbsp;
+            <a href="https://github.com/oernster/WebVigil/releases">All releases</a>
+            &nbsp;&middot;&nbsp;
+            <a href="https://github.com/oernster/WebVigil">Source on GitHub</a>
+        </p>
+    </section>
+
+    <section class="wrap support" id="support">
+        <p class="kicker">Supporting WebVigil</p>
+        <h2>Free. It stays free.</h2>
+        <div class="prose">
+            <p>There is no paid tier, no licence key and no feature held back behind a donation.
+                If WebVigil has saved you a few hundred refreshes, a contribution supports its
+                maintenance and continued development. The same link sits in the strip along
+                the foot of the window.</p>
+        </div>
+        <div class="cta">
+            <a class="btn btn-donate" href="https://www.paypal.com/ncp/payment/4JDW9BNNG97CE">
+                <img src="donate.png" alt="">
+                Donate
+            </a>
+        </div>
+    </section>
+
+</main>
+
+<footer class="wrap site-foot">
+    <span>&copy; Oliver Ernster. GPL-3.0.
+        <a href="https://ernster.dev/commercial-licensing.html">Commercial licences</a> available.</span>
+    <span><a href="https://github.com/oernster/WebVigil">Source</a> &middot;
+        <a href="https://ernster.dev">ernster.dev</a></span>
+</footer>
+
+<script>
+    // The download button never goes stale: it points at GitHub's releases/latest/download
+    // redirect, which always serves the newest release's file. This script only decorates
+    // the page: the version chip, the notes link and the file's size, read from the GitHub
+    // API. Where the call fails, the static text stands on its own; the chip then carries
+    // the version stamped into this page from the VERSION file. No date is ever shown.
+    (function () {
+        var api = 'https://api.github.com/repos/oernster/WebVigil/releases/latest';
+        fetch(api).then(function (r) {
+            if (!r.ok) { throw new Error('release lookup failed'); }
+            return r.json();
+        }).then(function (rel) {
+            var version = (rel.tag_name || '').replace(/^v/, '');
+            if (version) {
+                document.getElementById('dl-version').textContent = 'Version ' + version;
+            }
+            if (rel.html_url) {
+                document.getElementById('dl-whats-new').href = rel.html_url;
+            }
+            (rel.assets || []).forEach(function (asset) {
+                var meta = document.querySelector('[data-asset="' + asset.name + '"]');
+                if (meta && asset.size) {
+                    var mb = (asset.size / (1024 * 1024)).toFixed(1);
+                    meta.textContent = meta.textContent + ' · ' + mb + ' MB';
+                }
+            });
+        }).catch(function () { /* The static page already says everything essential. */ });
+    })();
+</script>
+
+</body>
+</html>

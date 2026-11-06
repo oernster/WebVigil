@@ -223,11 +223,18 @@ func TestSuppliedIconsAreUsed(t *testing.T) {
 // written for everyone who installs it, so none may appear in anything shipped (CODE RULES 14).
 var forbiddenIdentifiers = []string{"oernster", "codecrafter", "B0HQFRWWGN", "Evergence", "amazon.co.uk/dp"}
 
+// isProjectSite reports a file of the GitHub Pages site under docs/. The site is the publisher's own
+// page about WebVigil, so it names the publisher's repository by design; it is built into no binary.
+func isProjectSite(p string) bool {
+	rel, err := filepath.Rel(root, p)
+	return err == nil && strings.HasPrefix(filepath.ToSlash(rel), "docs/")
+}
+
 func TestNoUserSpecificData(t *testing.T) {
 	shipped := walk(t, ".", func(p string) bool {
 		ext := filepath.Ext(p)
 		test := strings.HasSuffix(p, "_test.go") || strings.Contains(p, ".test.")
-		return !test && (ext == ".go" || ext == ".ts" || ext == ".tsx" || ext == ".css" || ext == ".html" || ext == ".json") &&
+		return !test && !isProjectSite(p) && (ext == ".go" || ext == ".ts" || ext == ".tsx" || ext == ".css" || ext == ".html" || ext == ".json") &&
 			!strings.Contains(p, "package-lock")
 	})
 	for _, f := range shipped {

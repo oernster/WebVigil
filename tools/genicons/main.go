@@ -10,6 +10,7 @@
 //	installer/frontend/dist/dark-mode.png   the setup theme toggle (target dark)
 //	frontend/src/assets/icons/<name>.png    one glyph per master, cropped to its ink
 //	frontend/src/assets/donate.png          the donate mark, cropped and scaled by height
+//	docs/icon.png                           256, the project site's icon
 //
 // Glyphs are cropped to their visible pixels and scaled to a common ink height, so a master drawn
 // with a wide transparent margin renders at the same size as one drawn edge to edge.
@@ -37,6 +38,9 @@ const (
 	installerDist   = "installer/frontend/dist"
 	appIconSize     = 512
 	installMarkSize = 252 // twice the 126px header mark, crisp at 200% scaling
+	// The project site's icon: its favicon, header mark and Open Graph image.
+	siteIconFile = "docs/icon.png"
+	siteIconSize = 256
 	// glyphHeight is four times --toolbar-glyph-size (61px, PigeonPost's title-bar glyph), so the
 	// glyphs stay crisp under display scaling without carrying the 1254px masters into the binary.
 	// Raising that CSS token means raising this with it; neither language can read the other's.
@@ -84,6 +88,9 @@ func run() error {
 		}
 	}
 	if err := writePNG(filepath.Join(installerDist, "icon.png"), resize(square, installMarkSize)); err != nil {
+		return err
+	}
+	if err := writePNG(siteIconFile, resize(square, siteIconSize)); err != nil {
 		return err
 	}
 	count, err := writeGlyphs()

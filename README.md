@@ -17,6 +17,8 @@ tells you when the meaningful content changes. When a check fails it says why,
 in a category you can act on, rather than going quiet. Everything it records
 stays on your computer.
 
+Site: [ernster.dev/WebVigil](https://ernster.dev/WebVigil/)
+
 ## Who it is for
 
 - Anyone who keeps reopening the same pages to see whether something has moved:
@@ -164,7 +166,7 @@ WebVigil is free and stays free. Donations support maintenance and continued
 development. Nothing is withheld behind one: there is no paid tier, no licence
 key and no feature a donation unlocks.
 
-<a href="https://www.paypal.com/ncp/payment/4JDW9BNNG97CE"><img src="frontend/src/assets/donate.png" alt="Donate to WebVigil" width="120"></a>
+<a href="https://www.paypal.com/ncp/payment/4JDW9BNNG97CE"><img src="docs/donate.png" alt="Donate to WebVigil" width="120"></a>
 
 ## Licence
 
