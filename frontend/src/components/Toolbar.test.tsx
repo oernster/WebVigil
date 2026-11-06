@@ -5,7 +5,8 @@ import {Toolbar} from './Toolbar'
 
 const noop = () => undefined
 const props = {
-  paused: false, disabled: false, hasSites: true, note: '', onAdd: noop, onImport: noop, onExport: noop,
+  paused: false, disabled: false, hasSites: true, hasSelection: true, note: '',
+  onAdd: noop, onEdit: noop, onDelete: noop, onImport: noop, onExport: noop,
   onRefreshAll: noop, onTogglePause: noop, onSettings: noop,
   onGuide: noop, onAbout: noop, onLicence: noop, onCheckUpdates: noop,
 }
@@ -23,7 +24,8 @@ describe('Toolbar', () => {
   })
   it('uses the supplied icons with accessible names', () => {
     render(<Toolbar {...props} appearance="dark" onToggleTheme={noop} />)
-    for (const [name, src] of [['Add website', icons.addSite], ['Import sites', icons.importSites],
+    for (const [name, src] of [['Add website', icons.addSite], ['Edit selected website', icons.editSite],
+      ['Delete selected website', icons.deleteSite], ['Import sites', icons.importSites],
       ['Export sites', icons.exportSites], ['Refresh all', icons.refresh], ['Help', icons.helpAbout],
       ['Pause automatic monitoring', icons.pause], ['Settings', icons.settings]]) {
       expect(screen.getByRole('button', {name}).querySelector('img')).toHaveAttribute('src', src)
@@ -48,6 +50,24 @@ describe('Toolbar', () => {
     expect(resume).toHaveAttribute('aria-pressed', 'true')
     expect(resume.querySelector('img')).toHaveAttribute('src', icons.play)
     expect(screen.getByText('Monitoring paused')).toBeInTheDocument()
+  })
+  it('puts Edit and Delete straight after Add, then a divider before the rest', () => {
+    const {container} = render(<Toolbar {...props} appearance="dark" onToggleTheme={noop} />)
+    const order = Array.from(container.querySelector('.toolbar')!.children).slice(0, 5)
+      .map((el) => el.classList.contains('sep') ? 'sep' : el.getAttribute('aria-label'))
+    expect(order).toEqual(['Add website', 'Edit selected website', 'Delete selected website', 'sep', 'Import sites'])
+  })
+  it('acts on the selected site only while one is selected', async () => {
+    const onEdit = vi.fn()
+    const onDelete = vi.fn()
+    const {rerender} = render(<Toolbar {...props} onEdit={onEdit} onDelete={onDelete} appearance="dark" onToggleTheme={noop} />)
+    await userEvent.click(screen.getByRole('button', {name: 'Edit selected website'}))
+    await userEvent.click(screen.getByRole('button', {name: 'Delete selected website'}))
+    expect(onEdit).toHaveBeenCalledTimes(1)
+    expect(onDelete).toHaveBeenCalledTimes(1)
+    rerender(<Toolbar {...props} hasSelection={false} onEdit={onEdit} onDelete={onDelete} appearance="dark" onToggleTheme={noop} />)
+    expect(screen.getByRole('button', {name: 'Edit selected website'})).toBeDisabled()
+    expect(screen.getByRole('button', {name: 'Delete selected website'})).toBeDisabled()
   })
   it('disables what cannot be done', () => {
     render(<Toolbar {...props} hasSites={false} appearance="dark" onToggleTheme={noop} />)

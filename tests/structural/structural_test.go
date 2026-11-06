@@ -201,7 +201,7 @@ func TestWireMatches(t *testing.T) {
 
 var suppliedIcons = []string{
 	"application-icon.png", "help-about.png", "light-mode.png", "dark-mode.png", "refresh.png",
-	"add-site.png", "delete-site.png", "export-sites.png", "import-sites.png", "pause.png", "play.png", "settings.png",
+	"add-site.png", "edit-site.png", "delete-site.png", "export-sites.png", "import-sites.png", "pause.png", "play.png", "settings.png",
 }
 
 func TestSuppliedIconsAreUsed(t *testing.T) {

@@ -101,8 +101,10 @@ export function App() {
   return (
     <div className="shell">
       <Toolbar appearance={appearance} paused={state?.settings.paused ?? false} disabled={unavailable}
-        hasSites={sites.length > 0} note={pendingSummary(sites)}
+        hasSites={sites.length > 0} hasSelection={site !== null} note={pendingSummary(sites)}
         onAdd={openAdd} onImport={doImport} onExport={doExport}
+        onEdit={() => { if (site) openEdit(site.id) }}
+        onDelete={() => { if (site) setDialog({kind: 'delete', site}) }}
         onRefreshAll={() => api.refreshAll(fail)}
         onTogglePause={() => api.setPaused(!state?.settings.paused, fail).then(reload)}
         onToggleTheme={(t) => {

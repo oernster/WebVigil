@@ -7,8 +7,12 @@ interface Props {
   paused: boolean
   disabled: boolean
   hasSites: boolean
+  // hasSelection is whether a site is selected in the list; Edit and Delete act on that site.
+  hasSelection: boolean
   note: string
   onAdd: () => void
+  onEdit: () => void
+  onDelete: () => void
   onImport: () => void
   onExport: () => void
   onRefreshAll: () => void
@@ -40,6 +44,13 @@ export function Toolbar(p: Props) {
       <button className="icon-btn" title="Add website" aria-label="Add website" disabled={p.disabled} onClick={p.onAdd}>
         <img src={icons.addSite} alt="" />
       </button>
+      <button className="icon-btn" title="Edit the selected website" aria-label="Edit selected website" disabled={p.disabled || !p.hasSelection} onClick={p.onEdit}>
+        <img src={icons.editSite} alt="" />
+      </button>
+      <button className="icon-btn" title="Delete the selected website" aria-label="Delete selected website" disabled={p.disabled || !p.hasSelection} onClick={p.onDelete}>
+        <img src={icons.deleteSite} alt="" />
+      </button>
+      <span className="sep" aria-hidden="true" />
       <button className="icon-btn" title="Import sites" aria-label="Import sites" disabled={p.disabled} onClick={p.onImport}>
         <img src={icons.importSites} alt="" />
       </button>

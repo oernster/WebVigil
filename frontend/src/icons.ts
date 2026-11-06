@@ -4,6 +4,7 @@ import addSite from './assets/icons/add-site.png'
 import appIcon from './assets/icons/application-icon.png'
 import darkMode from './assets/icons/dark-mode.png'
 import deleteSite from './assets/icons/delete-site.png'
+import editSite from './assets/icons/edit-site.png'
 import exportSites from './assets/icons/export-sites.png'
 import helpAbout from './assets/icons/help-about.png'
 import importSites from './assets/icons/import-sites.png'
@@ -14,5 +15,5 @@ import refresh from './assets/icons/refresh.png'
 import settings from './assets/icons/settings.png'
 
 export const icons = {
-  addSite, appIcon, darkMode, deleteSite, exportSites, helpAbout, importSites, lightMode, pause, play, refresh, settings,
+  addSite, appIcon, darkMode, deleteSite, editSite, exportSites, helpAbout, importSites, lightMode, pause, play, refresh, settings,
 }
