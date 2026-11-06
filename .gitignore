@@ -38,8 +38,8 @@ go.work.sum
 /frontend/package.json.md5
 /installer/frontend/wailsjs/
 
-# Session resume snapshot (local only)
-.claude/resume.md
+# Claude's local working files: the resume snapshot and the preview launch config (local only)
+.claude/
 
 # Editor/IDE
 # .idea/
