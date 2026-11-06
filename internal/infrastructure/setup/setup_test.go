@@ -1,0 +1,120 @@
+package setup
+
+import (
+	"archive/zip"
+	"bytes"
+	"os"
+	"path/filepath"
+	"testing"
+)
+
+func zipOf(t *testing.T, files map[string]string) []byte {
+	t.Helper()
+	var buf bytes.Buffer
+	w := zip.NewWriter(&buf)
+	for name, body := range files {
+		f, err := w.Create(name)
+		if err != nil {
+			t.Fatal(err)
+		}
+		_, _ = f.Write([]byte(body))
+	}
+	_ = w.Close()
+	return buf.Bytes()
+}
+
+func TestExtractZip(t *testing.T) {
+	dest := filepath.Join(t.TempDir(), "WebVigil")
+	if err := ExtractZip(zipOf(t, map[string]string{"WebVigil.exe": "exe", "sub/readme.txt": "hi"}), dest); err != nil {
+		t.Fatal(err)
+	}
+	if b, _ := os.ReadFile(filepath.Join(dest, "sub", "readme.txt")); string(b) != "hi" {
+		t.Errorf("extracted %q", b)
+	}
+	if DirSizeKB(dest) != 0 {
+		t.Error("two tiny files are under a kilobyte")
+	}
+}
+
+func TestExtractZipFenceWritesNothing(t *testing.T) {
+	dest := filepath.Join(t.TempDir(), "WebVigil")
+	payload := zipOf(t, map[string]string{"a.txt": "first", "../escape.txt": "out"})
+	if err := ExtractZip(payload, dest); err == nil {
+		t.Fatal("an escaping entry was accepted")
+	}
+	if _, err := os.Stat(dest); !os.IsNotExist(err) {
+		t.Error("files were written before the fence refused the archive")
+	}
+	if err := ExtractZip([]byte("not a zip"), dest); err == nil {
+		t.Error("a corrupt payload was accepted")
+	}
+}
+
+func TestCopyFile(t *testing.T) {
+	dir := t.TempDir()
+	src := filepath.Join(dir, "a")
+	_ = os.WriteFile(src, []byte("setup"), 0o644)
+	if err := CopyFile(src, filepath.Join(dir, "b")); err != nil {
+		t.Fatal(err)
+	}
+	if err := CopyFile(filepath.Join(dir, "missing"), filepath.Join(dir, "c")); err == nil {
+		t.Error("copying a missing file succeeded")
+	}
+}
+
+func TestDirsFollowLocalAppData(t *testing.T) {
+	t.Setenv("LOCALAPPDATA", `C:\Users\someone\AppData\Local`)
+	inst, _ := InstallDir()
+	data, _ := DataDir()
+	if inst != filepath.Join(`C:\Users\someone\AppData\Local`, "Programs", "WebVigil") ||
+		data != filepath.Join(`C:\Users\someone\AppData\Local`, "WebVigil") {
+		t.Errorf("dirs = %s, %s", inst, data)
+	}
+	t.Setenv("LOCALAPPDATA", "")
+	if _, err := InstallDir(); err == nil {
+		t.Error("no LOCALAPPDATA was accepted")
+	}
+}
+
+func TestCompareVersions(t *testing.T) {
+	cases := []struct {
+		a, b string
+		want int
+	}{{"0.1.0", "0.2.0", -1}, {"1.10.0", "1.9.9", 1}, {"v1.2.3", "1.2.3", 0}, {"1.2.3-dev", "1.2.3", 0}, {"2", "1.9", 1}}
+	for _, c := range cases {
+		if got := CompareVersions(c.a, c.b); got != c.want {
+			t.Errorf("CompareVersions(%s, %s) = %d", c.a, c.b, got)
+		}
+	}
+}
+
+func TestDecideRouteAndWords(t *testing.T) {
+	cases := []struct {
+		installed bool
+		have      string
+		want      Route
+		action    string
+		flow      bool
+	}{
+		{false, "", RouteInstall, "Install", false},
+		{true, "0.0.9", RouteUpdate, "Update", true},
+		{true, "0.2.0", RouteDowngrade, "Go back", true},
+		{true, "0.1.0", RouteManage, "Repair", false},
+	}
+	for _, c := range cases {
+		r := DecideRoute(c.installed, c.have, "0.1.0")
+		w := Words(r, c.have, "0.1.0")
+		if r != c.want || w.Action != c.action || w.Flow != c.flow || w.Heading == "" || w.Lead == "" {
+			t.Errorf("%v %s: route %s, words %+v", c.installed, c.have, r, w)
+		}
+	}
+}
+
+func TestProgress(t *testing.T) {
+	if Progress(InstallSteps, 0) != 0 || Progress(InstallSteps, len(InstallSteps)) != 100 || Progress(nil, 0) != 0 {
+		t.Error("progress ends wrong")
+	}
+	if Progress(InstallSteps, 1) != 45 {
+		t.Errorf("weighted progress = %d", Progress(InstallSteps, 1))
+	}
+}

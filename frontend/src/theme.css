@@ -1,0 +1,49 @@
+/* Every colour WebVigil paints lives here, as tokens per appearance. The values are sampled from
+   application-icon.png: navy tile #032A61, deep blue #01309F, rim #0044C0, iris #0282FB, cyan glow
+   #2EE5FD and the window dots #FA070C, #FDCA02, #04DC07. Light mode names its own darker variants,
+   because the artwork's bright cyan and green fail contrast against white. */
+
+:root,
+:root[data-theme='dark'] {
+  --bg: #061229;
+  --surface: #0b1f45;
+  --surface-alt: #10295a;
+  --surface-hover: #163370;
+  --border: #1e3a70;
+  --text: #e6f1ff;
+  --text-muted: #9db3d6;
+  --accent: #2ee5fd;
+  --accent-strong: #0282fb;
+  --focus: #2ee5fd;
+  --on-accent: #032a61;
+  --ok: #04dc07;
+  --warn: #fc9c01;
+  --fail: #ff4d52;
+  --idle: #8193b5;
+  --added-bg: rgba(4, 220, 7, 0.16);
+  --removed-bg: rgba(255, 77, 82, 0.18);
+  --shadow: rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg: #f3f7fd;
+  --surface: #ffffff;
+  --surface-alt: #e8f0fb;
+  --surface-hover: #dbe7f8;
+  --border: #c5d5ee;
+  --text: #0a1a3a;
+  --text-muted: #4a5f85;
+  --accent: #0044c0;
+  --accent-strong: #01309f;
+  --focus: #0044c0;
+  --on-accent: #ffffff;
+  --ok: #0a7d12;
+  --warn: #a85800;
+  --fail: #c4060b;
+  --idle: #5e6e8c;
+  --added-bg: rgba(10, 125, 18, 0.13);
+  --removed-bg: rgba(196, 6, 11, 0.12);
+  --shadow: rgba(10, 26, 58, 0.25);
+  color-scheme: light;
+}

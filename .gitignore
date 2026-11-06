@@ -28,6 +28,22 @@ go.work.sum
 # env file
 .env
 
+# Build outputs and generated files
+/build/bin/
+/installer/build/bin/
+/dist-installer/
+/frontend/node_modules/
+/frontend/dist/
+/frontend/wailsjs/
+/frontend/package.json.md5
+/installer/frontend/wailsjs/
+
+# Session resume snapshot (local only)
+.claude/resume.md
+
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# The setup page's scroller, bundled from frontend/src/autoScrollDom.ts by build.ps1
+/installer/frontend/dist/autoscroll.js

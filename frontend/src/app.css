@@ -1,0 +1,236 @@
+/* Layout and components. Every colour is a token from theme.css; no literal colour lives here. */
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; margin: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 13px/1.4 "Segoe UI", system-ui, sans-serif;
+}
+
+button, input, select, textarea { font: inherit; color: inherit; }
+
+/* A focus ring belongs to a control, never to a container (house rule). */
+:focus { outline: none; }
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible,
+tr[tabindex]:focus-visible, a:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.shell { display: flex; flex-direction: column; height: 100%; }
+
+/* Toolbar glyph size, matched to PigeonPost's --titlebar-glyph-size. genicons renders the glyphs at
+   four times this height (glyphHeight), so the two move together. */
+:root {
+  --toolbar-glyph-size: 61px;
+  /* The donate mark's height, PigeonPost's --titlebar-icon-size; genicons renders it at four times. */
+  --donate-mark-size: 29px;
+  /* One height for both bars: the glyph tile (glyph + 6px), the bar's padding and its rule. */
+  --toolbar-height: calc(var(--toolbar-glyph-size) + 6px + 16px + 1px);
+}
+
+.toolbar {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px; min-height: var(--toolbar-height);
+  background: var(--surface); border-bottom: 1px solid var(--border);
+}
+
+/* The foot wears the toolbar's class, so it matches the header's height, padding and background;
+   only the edge its rule is drawn on differs. The donate mark keeps its own smaller size. */
+.bottombar { border-bottom: none; border-top: 1px solid var(--border); flex: none; }
+/* The donate button is PigeonPost's footer button: a short box around the mark, not the toolbar's
+   tall glyph tile, which squeezed it into a narrow upright rectangle. */
+.toolbar .icon-btn.donate { min-height: 0; padding: 2px 10px; }
+.toolbar .icon-btn.donate img { height: var(--donate-mark-size); width: auto; }
+.toolbar .sep { width: 1px; align-self: stretch; margin: 6px 4px; background: var(--border); }
+
+/* Toolbar buttons follow PigeonPost: an elevated tile, the artwork fitted into a square box so every
+   tile is the same size whatever the artwork's proportions; text buttons take the same height. */
+.toolbar .icon-btn {
+  height: auto; min-height: calc(var(--toolbar-glyph-size) + 6px); padding: 2px 7px;
+  background: var(--surface-alt); border: 1px solid var(--border); border-radius: 6px;
+}
+.toolbar .icon-btn img {
+  height: var(--toolbar-glyph-size); width: var(--toolbar-glyph-size); object-fit: contain; display: block;
+}
+.toolbar .icon-btn:hover:not(:disabled) { border-color: var(--accent); background: var(--surface-hover); }
+.toolbar .icon-btn .label { padding: 0 8px; font-size: 14px; }
+/* Paused: the button shows play, the action it will take; the amber border plus the "Monitoring
+   paused" note say the state, so it is never told by the picture alone. */
+.toolbar .icon-btn[aria-pressed='true'] { border-color: var(--warn); border-width: 2px; }
+.toolbar .spacer { flex: 1; }
+.toolbar .note { color: var(--warn); font-weight: 600; margin-right: 8px; }
+
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 36px; min-width: 36px; padding: 0 6px; border: 1px solid transparent; border-radius: 7px;
+  background: transparent; cursor: pointer;
+}
+.icon-btn img { height: 28px; width: auto; }
+.icon-btn.small { height: 28px; min-width: 28px; padding: 0 4px; }
+.icon-btn.small img { height: 20px; }
+.icon-btn:hover:not(:disabled) { background: var(--surface-hover); border-color: var(--border); }
+.icon-btn:disabled { opacity: 0.4; cursor: default; }
+.icon-btn .label { font-weight: 600; }
+
+.btn {
+  height: 32px; padding: 0 14px; border-radius: 7px; border: 1px solid var(--border);
+  background: var(--surface-alt); cursor: pointer; font-weight: 600;
+}
+.btn:hover:not(:disabled) { background: var(--surface-hover); }
+.btn.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.btn.danger { color: var(--fail); border-color: var(--fail); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+
+.banner { padding: 8px 12px; border-bottom: 1px solid var(--border); background: var(--surface-alt); }
+.banner.error { color: var(--fail); font-weight: 600; }
+.banner button { margin-left: 12px; }
+
+.main { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.table-wrap { flex: 1; overflow: auto; min-height: 120px; }
+
+table.sites { border-collapse: collapse; table-layout: fixed; min-width: 100%; }
+table.sites th, table.sites td {
+  padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: left;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+table.sites th {
+  position: sticky; top: 0; background: var(--surface); z-index: 1; user-select: none; font-weight: 600;
+}
+table.sites th button.sort { all: unset; cursor: pointer; display: block; width: 100%; }
+table.sites th button.sort:focus-visible { outline: 2px solid var(--focus); }
+table.sites th .grip { position: absolute; right: 0; top: 0; bottom: 0; width: 6px; cursor: col-resize; }
+table.sites tr.row { cursor: default; }
+table.sites tr.row:hover { background: var(--surface-hover); }
+table.sites tr.row.selected { background: var(--surface-alt); }
+table.sites tr.row.disabled td:not(.actions) { color: var(--text-muted); }
+td.actions { display: flex; gap: 2px; overflow: visible; }
+
+.light { display: inline-flex; align-items: center; gap: 6px; }
+.light .mark { width: 12px; height: 12px; display: inline-block; flex: none; }
+.light .mark.circle { border-radius: 50%; }
+.light .mark.ring { border-radius: 50%; border: 2px solid var(--idle); }
+.light .mark.square { border-radius: 2px; }
+.light .mark.diamond { transform: rotate(45deg) scale(0.85); }
+.light.green .mark { background: var(--ok); }
+.light.amber .mark { background: var(--warn); }
+.light.red .mark { background: var(--fail); }
+.light.grey .label { color: var(--idle); }
+.light .badge {
+  margin-left: 2px; padding: 0 6px; border-radius: 9px; background: var(--warn); color: var(--on-accent);
+  font-size: 11px; font-weight: 700;
+}
+.spinner {
+  width: 10px; height: 10px; border: 2px solid var(--accent); border-top-color: transparent;
+  border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+
+.details {
+  border-top: 1px solid var(--border); background: var(--surface); height: 42%; min-height: 180px;
+  display: flex; flex-direction: column;
+}
+.details header { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+.details header h2 { margin: 0; font-size: 15px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.details .tabs { display: flex; gap: 4px; padding: 6px 12px 0; }
+.details .tabs button[aria-selected='true'] { background: var(--surface-alt); border-color: var(--accent); }
+.details .body { flex: 1; overflow: auto; padding: 8px 12px; }
+dl.facts { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; margin: 0; }
+dl.facts dt { color: var(--text-muted); }
+dl.facts dd { margin: 0; overflow-wrap: anywhere; }
+.alert { color: var(--warn); font-weight: 600; }
+.failed { color: var(--fail); font-weight: 600; }
+
+table.list { border-collapse: collapse; width: 100%; }
+table.list th, table.list td { padding: 4px 6px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+table.list td.wrap { white-space: normal; overflow-wrap: anywhere; }
+
+.diff { font-family: Consolas, "Cascadia Mono", monospace; font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.diff .added { background: var(--added-bg); }
+.diff .removed { background: var(--removed-bg); text-decoration: line-through; }
+.diff .op { display: inline-block; width: 1.5em; color: var(--text-muted); user-select: none; }
+
+.backdrop { position: fixed; inset: 0; background: var(--shadow); display: flex; align-items: center; justify-content: center; z-index: 10; }
+.modal {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 10px 40px var(--shadow);
+  width: min(760px, 94vw); max-height: 92vh; display: flex; flex-direction: column;
+}
+.modal.narrow { width: min(460px, 94vw); }
+.modal header { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.modal header img { height: 28px; }
+.modal header h1 { font-size: 16px; margin: 0; }
+.modal .content { padding: 12px 16px; overflow: auto; }
+.modal footer { padding: 10px 16px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+.modal footer .left { margin-right: auto; }
+
+.form { display: grid; grid-template-columns: 170px 1fr; gap: 8px 12px; align-items: center; }
+.form label.full, .form .full { grid-column: 1 / -1; }
+.form input[type='text'], .form input[type='number'], .form select, .form textarea {
+  width: 100%; padding: 5px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-alt);
+}
+.form textarea { min-height: 54px; resize: vertical; font-family: Consolas, "Cascadia Mono", monospace; font-size: 12px; }
+.form .hint { color: var(--text-muted); font-size: 12px; grid-column: 2; margin-top: -4px; }
+.form fieldset { grid-column: 1 / -1; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; }
+.form legend { padding: 0 4px; color: var(--text-muted); }
+.checks { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.field-row { display: grid; grid-template-columns: 1fr 1.3fr 0.8fr auto auto; gap: 6px; margin-bottom: 6px; align-items: center; }
+.error-text { color: var(--fail); font-weight: 600; }
+.preview { max-height: 220px; overflow: auto; white-space: pre-wrap; background: var(--surface-alt); padding: 8px; border-radius: 6px; }
+.about { text-align: center; }
+.about img { width: 96px; }
+.about h2 { margin: 4px 0 2px; }
+.about p { margin: 0 0 10px; color: var(--text-muted); }
+
+/* The Help menu, ported from PigeonPost's title-tray dropdown. The trigger is a toolbar tile like its
+   neighbours; while open it wears the accent border and its tooltip stands down, since the dropdown
+   header already names it. */
+.menu { position: relative; }
+.toolbar .icon-btn.menu-title.active { border-color: var(--accent); background: var(--surface-hover); }
+.menu-dropdown {
+  position: absolute; right: 0; top: calc(100% + 4px); min-width: 190px; padding: 4px 0; z-index: 5;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 8px 24px var(--shadow);
+}
+.menu-header { padding: 6px 12px 4px; font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.menu-item {
+  display: block; width: 100%; text-align: left; padding: 7px 14px; border: none; background: transparent;
+  cursor: pointer; white-space: nowrap;
+}
+/* Keyboard focus highlights an item exactly as hover does; the highlight is the one focus cue. */
+.menu-item:hover, .menu-item:focus-visible { background: var(--surface-hover); outline: none; }
+.menu-sep { height: 1px; margin: 4px 6px; background: var(--border); }
+
+/* About, ported from PigeonPost: label and value rows, then the credits. */
+.about-lines { display: grid; gap: 4px; margin: 0 0 10px; }
+.about-label { display: inline-block; min-width: 72px; color: var(--text-muted); }
+.about-path { overflow-wrap: anywhere; }
+.about-copyright { margin-top: 6px; color: var(--text-muted); }
+.about-rule { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+.about-credits-title { margin: 0 0 6px; font-size: 14px; }
+.about-credits { list-style: none; margin: 0; padding: 0; }
+.about-credits li { display: flex; justify-content: space-between; gap: 12px; padding: 2px 0; }
+.credit-licence { color: var(--text-muted); }
+
+/* The licence reads as the plain text it is. The body is the scroller; the pre only wraps. */
+.licence-text {
+  margin: 0; white-space: pre-wrap; overflow-wrap: anywhere;
+  font-family: Consolas, "Cascadia Mono", monospace; font-size: 12px;
+}
+
+/* The Guide, ported from PigeonPost's guide.css. Each section's heading holds at the top of the body
+   until the next one pushes it away; it is painted on the dialog's own surface so text passing under
+   it does not show through; its gap to the text is padding for the same reason. */
+.modal.guide { text-align: left; }
+.guide-section { margin-bottom: 22px; }
+.guide-section:last-child { margin-bottom: 0; }
+.guide-heading {
+  position: sticky; top: 0; z-index: 1; margin: 0; padding-bottom: 8px; background: var(--surface); font-size: 15px;
+}
+.guide-intro, .guide-rule, .guide-para { margin: 0 0 10px; line-height: 1.55; color: var(--text-muted); }
+/* A picture and a sentence on one row, the picture drawn larger than in the bar so two icons can be
+   told apart, aligned to the first line so a wrapped sentence keeps it beside its start. */
+.guide-entry { display: flex; align-items: flex-start; gap: 10px; margin: 0 0 8px; line-height: 1.55; color: var(--text-muted); }
+.guide-icon { width: 30px; height: 30px; flex: none; object-fit: contain; }
+.guide-entry .light { flex: none; min-width: 90px; }
+.guide-entry b, .guide-rule b { color: var(--text); }

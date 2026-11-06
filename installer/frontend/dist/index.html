@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WebVigil Setup</title>
+<style>
+/* Colours sampled from application-icon.png, as in the app's theme.css. Light and dark each name
+   their own accent and ring: the artwork's bright cyan and green fail against white. Ring model:
+   none at rest, green while an enabled control is hovered or focused, a permanent danger ring on a
+   disabled one. The accent carries identity, never state, so it is never a ring. */
+:root, :root[data-theme='dark'] {
+  --bg: #061229; --surface: #0b1f45; --surface-alt: #10295a; --border: #1e3a70;
+  --text: #e6f1ff; --muted: #9db3d6; --accent: #2ee5fd; --accent-rgb: 46, 229, 253;
+  --select: #0282fb; --on-select: #ffffff; --ring: #04dc07; --danger: #ff4d52; --danger-soft: rgba(255, 77, 82, 0.14);
+  color-scheme: dark;
+}
+:root[data-theme='light'] {
+  --bg: #f3f7fd; --surface: #ffffff; --surface-alt: #e8f0fb; --border: #c5d5ee;
+  --text: #0a1a3a; --muted: #4a5f85; --accent: #0044c0; --accent-rgb: 0, 68, 192;
+  --select: #0044c0; --on-select: #ffffff; --ring: #0a7d12; --danger: #c4060b; --danger-soft: rgba(196, 6, 11, 0.1);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--text); font: 14px/1.5 "Segoe UI", system-ui, sans-serif; user-select: none; overflow: hidden; }
+#Shell { height: 100vh; display: flex; flex-direction: column;
+  background: radial-gradient(640px 420px at 50% 0%, rgba(var(--accent-rgb), 0.16), transparent 70%); }
+header, footer, main { background: transparent; }
+header { display: flex; align-items: center; gap: 18px; padding: 20px 26px; }
+header img.mark { width: 126px; height: 126px; flex: none; }
+header .names { flex: 1; min-width: 0; }
+header .name { font-size: 32px; font-weight: 700; white-space: nowrap; }
+header .tagline { color: var(--muted); font-size: 14px; }
+.rule { height: 1px; background: var(--border); margin: 0 26px; }
+main { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 18px 34px; min-height: 0; }
+.screen { display: none; } .screen.active { display: block; }
+h1 { font-size: 22px; margin: 0 0 8px; }
+p.lead { color: var(--muted); margin: 0 0 14px; }
+.flow { font-size: 18px; margin: 0 0 14px; } .flow .from { color: var(--muted); } .flow .arrow { color: var(--accent); margin: 0 10px; } .flow .to { font-weight: 700; }
+.where { color: var(--muted); font-size: 12px; word-break: break-all; margin-bottom: 10px; }
+label.option { display: flex; align-items: center; gap: 10px; margin: 8px 0; cursor: pointer; }
+label.option input { width: 18px; height: 18px; accent-color: var(--select); margin: 0; }
+.center { text-align: center; }
+.verdict-mark { font-size: 44px; line-height: 1; margin-bottom: 8px; }
+.verdict-mark.ok { color: var(--ring); } .verdict-mark.bad { color: var(--danger); }
+.bar { height: 10px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); overflow: hidden; margin: 16px 0 8px; }
+.bar div { height: 100%; width: 0; background: var(--accent); transition: width 0.25s ease; }
+.step { color: var(--muted); }
+/* A text view never rings (noborderfocus). The browser makes the licence a Tab stop while it
+   overflows, so it can be read from the keyboard; the browser would paint its own ring round the whole pane. */
+pre.licence { outline: none; }
+pre.licence { white-space: pre-wrap; font-size: 11px; max-height: 300px; overflow: auto; background: var(--surface); border: 1px solid var(--border); padding: 10px; border-radius: 8px; user-select: text; }
+footer { display: flex; justify-content: flex-end; gap: 10px; padding: 16px 26px 20px; }
+footer .left { margin-right: auto; }
+button { font: inherit; color: var(--text); background: var(--surface-alt); border: 2px solid transparent; border-radius: 9px;
+  padding: 11px 22px; font-weight: 600; cursor: pointer; outline: none; }
+button.Primary { background: var(--select); color: var(--on-select); }
+button.Danger { background: var(--danger-soft); color: var(--danger); }
+button.text { background: transparent; padding: 6px 12px; }
+button.toggle { background: transparent; padding: 4px; line-height: 0; }
+button.toggle img { width: 40px; height: 40px; }
+/* Each button kind names its own ring, so no kind is left without one by specificity. */
+button:enabled:hover, button:enabled:focus-visible,
+button.Primary:enabled:hover, button.Primary:enabled:focus-visible,
+button.Danger:enabled:hover, button.Danger:enabled:focus-visible,
+button.text:enabled:hover, button.text:enabled:focus-visible,
+button.toggle:enabled:hover, button.toggle:enabled:focus-visible { border-color: var(--ring); }
+button:disabled { border-color: var(--danger); cursor: default; opacity: 0.6; }
+label.option:focus-within { outline: 2px solid var(--ring); outline-offset: 3px; border-radius: 4px; }
+#sink { position: absolute; width: 0; height: 0; overflow: hidden; }
+</style>
+</head>
+<body>
+<div id="Shell">
+  <span id="sink" tabindex="-1"></span>
+  <header>
+    <img class="mark" src="icon.png" alt="WebVigil"/>
+    <div class="names"><div class="name">WebVigil</div><div class="tagline">Watch the web. Know what changes.</div></div>
+    <button class="text" id="licence-btn">Licence</button>
+    <button class="toggle" id="theme-btn"><img id="theme-img" alt=""/></button>
+  </header>
+  <div class="rule"></div>
+  <main>
+    <section class="screen" id="screen-route">
+      <h1 id="route-heading"></h1>
+      <div class="flow" id="route-flow" hidden><span class="from" id="flow-from"></span><span class="arrow">&rarr;</span><span class="to" id="flow-to"></span></div>
+      <p class="lead" id="route-lead"></p>
+      <div class="where" id="route-where"></div>
+      <label class="option"><input type="checkbox" id="opt-startmenu"/> Add WebVigil to the Start menu</label>
+      <label class="option"><input type="checkbox" id="opt-desktop"/> Add a desktop shortcut</label>
+      <label class="option"><input type="checkbox" id="opt-signin"/> Start WebVigil when I sign in, waiting in the tray</label>
+      <label class="option"><input type="checkbox" id="opt-launch"/> Open WebVigil when setup finishes</label>
+    </section>
+    <section class="screen" id="screen-uninstall">
+      <h1>Remove WebVigil?</h1>
+      <p class="lead">This removes the program, its shortcuts, its sign-in entry and its notification registration.</p>
+      <label class="option"><input type="checkbox" id="opt-data"/> Also delete my websites, their history and settings (cannot be undone)</label>
+    </section>
+    <section class="screen" id="screen-running">
+      <h1>WebVigil is open</h1>
+      <p class="lead">WebVigil must close before setup can continue. Your websites and history are not affected.</p>
+    </section>
+    <section class="screen" id="screen-progress">
+      <h1 id="progress-title"></h1>
+      <div class="bar"><div id="bar-fill"></div></div>
+      <div class="step" id="progress-step"></div>
+    </section>
+    <section class="screen center" id="screen-verdict">
+      <div class="verdict-mark" id="verdict-mark"></div>
+      <h1 id="verdict-title"></h1>
+      <p class="lead" id="verdict-line"></p>
+    </section>
+    <section class="screen" id="screen-licence">
+      <h1>Licence</h1>
+      <pre class="licence" id="licence-text"></pre>
+    </section>
+  </main>
+  <div class="rule"></div>
+  <footer id="footer"></footer>
+</div>
+<!-- The application's own self-reading cycle (frontend/src/autoScrollDom.ts), bundled here by
+     build.ps1 as the global WebVigilScroll: one implementation for both programs, none copied. -->
+<script src="autoscroll.js"></script>
+<script>
+const $ = (id) => document.getElementById(id)
+const go = () => window.go.main.App
+let state = null
+let screenBehind = 'route'
+const LAUNCH_WAIT_MS = 1500
+
+// stopLicenceReading ends the licence's self-reading cycle; a fresh one starts each time it opens.
+let stopLicenceReading = () => {}
+
+function show(name) {
+  stopLicenceReading()
+  stopLicenceReading = () => {}
+  document.querySelectorAll('.screen').forEach((s) => s.classList.toggle('active', s.id === 'screen-' + name))
+}
+
+// The footer belongs to the screen: rebuilt from a list each time, never relabelled in place.
+function actions(list) {
+  const footer = $('footer')
+  while (footer.firstChild) footer.removeChild(footer.firstChild)
+  for (const a of list) {
+    const b = document.createElement('button')
+    b.textContent = a.label
+    b.className = (a.kind || '') + (a.left ? ' left' : '')
+    b.onclick = a.run
+    footer.appendChild(b)
+  }
+}
+
+// The toggle shows the appearance it switches TO; repaint and re-facing happen together.
+function paint(theme) {
+  document.documentElement.dataset.theme = theme
+  const target = theme === 'dark' ? 'light' : 'dark'
+  $('theme-img').src = target + '-mode.png'
+  $('theme-btn').setAttribute('aria-label', 'Switch to ' + target + ' appearance')
+  $('theme-btn').title = 'Switch to ' + target + ' appearance'
+}
+
+function options() {
+  return {signIn: $('opt-signin').checked, startMenu: $('opt-startmenu').checked, desktop: $('opt-desktop').checked}
+}
+
+function verdict(ok, title, line) {
+  show('verdict')
+  $('verdict-mark').textContent = ok ? '✓' : '⚠'
+  $('verdict-mark').className = 'verdict-mark ' + (ok ? 'ok' : 'bad')
+  $('verdict-title').textContent = title
+  $('verdict-line').textContent = line
+  actions([{label: 'Close', kind: 'Primary', run: () => go().Quit()}])
+}
+
+// Ask whether WebVigil is running BEFORE any file is touched.
+async function whenClosed(then) {
+  if (!(await go().AppRunning())) return then()
+  show('running')
+  actions([
+    {label: 'Cancel', run: () => routeScreen()},
+    {label: 'Close it and continue', kind: 'Primary', run: async () => {
+      try { await go().CloseApp() } catch (e) { return verdict(false, 'WebVigil is still open', String(e)) }
+      then()
+    }},
+  ])
+}
+
+async function perform(title, work, doneTitle, doneLine, launch) {
+  show('progress')
+  actions([])
+  $('progress-title').textContent = title
+  $('bar-fill').style.width = '0'
+  $('progress-step').textContent = ''
+  try {
+    await work()
+  } catch (e) {
+    return verdict(false, 'Setup did not finish', String(e) + '. The step log is at ' + state.logPath + '.')
+  }
+  if (launch) {
+    try {
+      await go().Launch()
+      // Bring the new window forward first, then close setup, so it does not only flash on the taskbar.
+      setTimeout(() => go().Quit(), LAUNCH_WAIT_MS)
+      return verdict(true, doneTitle, 'WebVigil is starting.')
+    } catch (e) {
+      return verdict(false, 'Installed; WebVigil did not start', String(e))
+    }
+  }
+  verdict(true, doneTitle, doneLine)
+}
+
+function routeScreen() {
+  screenBehind = 'route'
+  const w = state.words
+  const m = state.machine
+  show('route')
+  $('route-heading').textContent = w.heading
+  $('route-lead').textContent = w.lead
+  $('route-flow').hidden = !w.flow
+  $('flow-from').textContent = 'v' + m.installedVersion
+  $('flow-to').textContent = 'v' + state.thisVersion
+  $('route-where').textContent = 'Installs to ' + m.installDir
+  // Options open on what is already true; a first install offers the usual choices.
+  $('opt-startmenu').checked = m.installed ? m.startMenu : true
+  $('opt-desktop').checked = m.installed ? m.desktop : false
+  $('opt-signin').checked = m.installed ? m.signIn : true
+  $('opt-launch').checked = true
+  const manage = state.route === 'manage'
+  // On Manage there is nothing to install, so a toggle applies immediately.
+  for (const id of ['opt-startmenu', 'opt-desktop', 'opt-signin']) {
+    $(id).onchange = manage ? () => go().ApplyOption(options()).catch((e) => verdict(false, 'The change was not applied', String(e))) : null
+  }
+  const doneTitle = {install: 'WebVigil is installed', update: 'WebVigil is updated', downgrade: 'WebVigil has gone back', manage: 'Repair complete'}[state.route]
+  const go_ = () => whenClosed(() => perform(w.action + '…', () => go().Install(options()), doneTitle,
+    'You can open WebVigil from the Start menu.', $('opt-launch').checked))
+  const list = []
+  if (m.installed) list.push({label: 'Uninstall', kind: 'Danger', left: true, run: uninstallScreen})
+  list.push({label: 'Close', run: () => go().Quit()})
+  list.push({label: w.action, kind: 'Primary', run: go_})
+  actions(list)
+}
+
+function uninstallScreen() {
+  screenBehind = 'uninstall'
+  show('uninstall')
+  $('opt-data').checked = false
+  actions([
+    {label: 'Cancel', run: () => state.uninstallOnly ? go().Quit() : routeScreen()},
+    {label: 'Uninstall', kind: 'Danger', run: () => whenClosed(() => perform('Removing WebVigil', () => go().Uninstall($('opt-data').checked),
+      'WebVigil is removed', $('opt-data').checked ? 'Its websites and history were deleted too.' : 'Your websites and history were kept.'))},
+  ])
+}
+
+async function licenceScreen() {
+  const back = screenBehind
+  try { $('licence-text').textContent = await go().Licence() } catch (e) { $('licence-text').textContent = String(e) }
+  show('licence')
+  // The licence is the scroller and Back sits in the footer outside it, so the way out never scrolls
+  // away. Without the bundle (a build that skipped build.ps1) it simply holds still.
+  if (window.WebVigilScroll) stopLicenceReading = window.WebVigilScroll.attachAutoScroll($('licence-text'))
+  actions([{label: 'Back', kind: 'Primary', run: () => back === 'uninstall' ? uninstallScreen() : routeScreen()}])
+}
+
+// Enter activates the focused control, as Space already does, checkboxes included.
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && document.activeElement && document.activeElement.type === 'checkbox') {
+    e.preventDefault()
+    document.activeElement.click()
+  }
+})
+
+async function init() {
+  for (let i = 0; i < 100 && !(window.go && window.go.main); i++) await new Promise((r) => setTimeout(r, 50))
+  paint(window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+  $('theme-btn').onclick = () => paint(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark')
+  $('licence-btn').onclick = licenceScreen
+  if (!(window.go && window.go.main)) return verdict(false, 'Setup could not start', 'The setup window could not reach its own program.')
+  window.runtime.EventsOn('progress', (p) => { $('bar-fill').style.width = p.pct + '%'; $('progress-step').textContent = p.step })
+  state = await go().State()
+  if (state.uninstallOnly && state.machine.installed) uninstallScreen()
+  else routeScreen()
+  $('sink').focus() // neutral start: nothing wears a ring until Tab is pressed
+}
+window.addEventListener('DOMContentLoaded', init)
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "WebVigilSetup",
+  "outputfilename": "WebVigilSetup",
+  "frontend:install": "cmd /c echo skip",
+  "frontend:build": "cmd /c echo skip",
+  "author": {
+    "name": "Oliver Ernster"
+  },
+  "info": {
+    "companyName": "Oliver Ernster",
+    "productName": "WebVigil Setup",
+    "copyright": "Copyright (c) Oliver Ernster. GPL-3.0.",
+    "comments": "Installs WebVigil for the current user."
+  }
+}
