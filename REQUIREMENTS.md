@@ -367,7 +367,7 @@ Verified by: `internal/application/scheduler_test.go::TestPauseStopsScheduling`
 
 **FR-088 Shutdown.** When the application exits, the scheduler shall cancel
 running checks and return before the store is closed.
-Verified by: `internal/application/scheduler_test.go::TestStopCancelsAndWaits`
+Verified by: `internal/application/engine_test.go::TestStopCancelsAndWaits`
 
 ### 3.9 Notifications
 
@@ -450,9 +450,9 @@ Verified by: `internal/application/settings_test.go::TestThemePersists`
 the mode it switches to.
 Verified by: `frontend/src/components/Toolbar.test.tsx`
 
-**FR-122 Supplied icons.** The toolbar and actions shall use the nine supplied
-images by their file names.
-Verified by: `tests/structural/assets_test.go::TestSuppliedIconsAreUsed`
+**FR-122 Supplied icons.** The toolbar and actions shall use every supplied
+image in `assets/` by its file name.
+Verified by: `tests/structural/structural_test.go::TestSuppliedIconsAreUsed`
 
 ### 3.13 Setup program
 
@@ -465,7 +465,9 @@ Install, Update, Downgrade or Manage; Uninstall is reachable from every screen.
 the user to close a running WebVigil.
 **FR-133 Fenced payload.** The setup program shall refuse an archive entry that
 would land outside the install folder.
-Verified by: `internal/installer/*_test.go`; the screens by hand.
+Verified by: `internal/infrastructure/setup/setup_test.go` (the install paths,
+the routes and the payload fence); the registry writes, the running-app check
+and the screens by hand.
 
 ### 3.14 Help
 
@@ -530,8 +532,10 @@ be enforced by `tests/structural`.
 
 **NFR-MNT-003** No Go or TypeScript source file shall exceed 400 lines.
 
-**NFR-PRV-001** All data shall stay under `%LOCALAPPDATA%\WebVigil` on the
-user's machine.
+**NFR-PRV-001** All data shall stay on the user's machine. WebVigil's own
+database and run log live under `%LOCALAPPDATA%\WebVigil`; the WebView2 runtime
+keeps the window's browser profile, which holds the skipped update version,
+under `%APPDATA%\WebVigil.exe`.
 
 ## 5. Open questions
 

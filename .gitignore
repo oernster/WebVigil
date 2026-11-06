@@ -47,3 +47,6 @@ go.work.sum
 
 # The setup page's scroller, bundled from frontend/src/autoScrollDom.ts by build.ps1
 /installer/frontend/dist/autoscroll.js
+
+# Release notes, drafted for the GitHub release body (local only)
+NOTES.md
