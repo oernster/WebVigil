@@ -17,7 +17,7 @@ The overriding requirement, from which every other one follows:
 
 ### 1.1 Purpose
 
-WebVigil is a Windows desktop application that checks user-defined web pages on
+WebVigil is a desktop application for Windows, macOS and Linux that checks user-defined web pages on
 a schedule, records what each check found and raises an alarm when the
 meaningful content of a page changes. It runs locally with no cloud service, no
 AI model and no subscription.
@@ -26,12 +26,13 @@ AI model and no subscription.
 
 In scope: website definitions, scheduled and manual checks, change detection by
 deterministic comparison, failure classification, notifications, history with a
-diff viewer, import and export of definitions, a tray presence, sign-in start,
-light and dark appearance and a per-user setup program.
+diff viewer, import and export of definitions, a tray presence on Windows,
+sign-in start, light and dark appearance, a per-user setup program on Windows,
+a disk image for macOS and a Flatpak for Linux.
 
 Out of scope (Won't this time):
 
-- Monitoring before Windows sign-in (no Windows service).
+- Monitoring before the user signs in (no background service).
 - Authenticated monitoring: no stored credentials, cookies or sessions.
 - Running JavaScript from fetched pages; pages that render their content only
   through script are reported as an extraction failure, not worked around.
@@ -41,7 +42,7 @@ Out of scope (Won't this time):
   definitions only.
 - Telemetry. Network traffic beyond the checks the user configured and the one
   release query of FR-144 is out of scope.
-- macOS and Linux builds.
+- A tray presence on macOS or Linux.
 
 ### 1.3 Definitions
 
@@ -77,16 +78,17 @@ Out of scope (Won't this time):
 | Failure warning threshold default | 3 consecutive failures |
 | Repeat alarm until acknowledged | off by default |
 | Built-in alarm | a chime synthesised in code; no sound file shipped |
-| Delivery | `WebVigil.exe` plus a per-user setup program in the house style |
+| Delivery | Windows: `WebVigil.exe` inside a per-user setup program in the house style; macOS: a signed, notarised `WebVigil.dmg` for Apple Silicon; Linux: a `webvigil.flatpak` bundle |
+| Closing the window | Windows: asks Minimise to Tray or Quit; macOS and Linux: quits |
 
 ## 2. Overall description
 
-- **User class:** one person on a Windows 11 desktop, signed in, monitoring a
-  handful to a few hundred pages.
-- **Environment:** Windows 10 or 11 on x64 with the WebView2 runtime.
+- **User class:** one person on a Windows, macOS or Linux desktop, signed in,
+  monitoring a handful to a few hundred pages.
+- **Environment:** Windows 10 or 11 on x64 with the WebView2 runtime; macOS on
+  Apple Silicon; Linux through Flatpak on the GNOME runtime.
 - **Constraints:** Go, Wails v2, React with TypeScript, SQLite through
-  `modernc.org/sqlite` (no CGO), everything written per user under
-  `%LOCALAPPDATA%` and `HKCU`.
+  `modernc.org/sqlite` (no CGO), everything written per user (NFR-PRV-001).
 - **Assumption (owner Oliver):** the target pages serve their meaningful content
   in the initial HTML. Where they do not, FR-044 reports it.
 
@@ -349,12 +351,14 @@ host less than 10 s apart.
 Verified by: `internal/application/scheduler_test.go::TestHostSpacing`
 
 **FR-084 Interval.** The scheduler shall make a site due its interval after its
-last check; intervals below 5 min are refused.
-Verified by: `internal/domain/schedule_test.go::TestNextDue`
+last check; intervals below 5 min or above 7 days are refused.
+Verified by: `internal/domain/schedule_test.go::TestNextDue` and
+`internal/domain/site_test.go::TestNormalisedRefuses`
 
 **FR-085 Backoff.** After consecutive failures the scheduler shall double the
-wait per failure up to 24 h; after 429 or 503 with Retry-After it shall wait at
-least that long.
+wait per failure up to 24 h (up to the site's own interval when that is
+longer); after 429 or 503 with Retry-After it shall wait at least that long,
+within the same ceiling.
 Verified by: `internal/domain/schedule_test.go::TestBackoffAndRetryAfter`
 
 **FR-086 No backlog.** When the application resumes after sleep or a long gap,
@@ -372,10 +376,13 @@ Verified by: `internal/application/engine_test.go::TestStopCancelsAndWaits`
 ### 3.9 Notifications
 
 **FR-090 Change alarm.** When a change is recorded on a site with sound on, the
-alerter shall play the alarm; with visual on it shall show a Windows
-notification naming the site, the time and a summary.
-Verified by: `internal/application/check_test.go::TestChangeRaisesAlarm`;
-the toast itself by hand on a real desktop.
+alerter shall play the alarm; with visual on it shall show a desktop
+notification naming the site, the time and a summary. On macOS and Linux the
+alarm shall play through the first system player present (`afplay`; `paplay`,
+`pw-play`, `aplay`, `gst-play-1.0`), which returns when the sound has finished.
+Verified by: `internal/application/check_test.go::TestChangeRaisesAlarm` and
+`internal/infrastructure/sound/external_test.go`; the notification and the
+sound themselves by hand on a real desktop.
 
 **FR-091 No overlapping sound.** When several changes arrive together, the
 alerter shall play one alarm at a time.
@@ -417,17 +424,28 @@ Verified by: `internal/infrastructure/storage/history_test.go::TestRetention`
 
 ### 3.11 Application lifecycle
 
-**FR-110 Tray.** The application shall show a tray icon with Open, Refresh All,
-Pause or Resume and Exit. Verified by hand.
+**FR-110 Tray.** On Windows the application shall show a tray icon with Open,
+Refresh All, Pause or Resume and Exit. Verified by hand.
 
-**FR-111 Close hides.** When the window is closed, the application shall hide it
-and keep monitoring; Exit shall stop monitoring and quit.
-Verified by hand; the engine side by `TestStopCancelsAndWaits`.
+**FR-111 Closing the window.** On Windows, when the window's close button is
+pressed, the application shall keep the window open and offer Minimise to tray
+(which hides it and keeps monitoring) or Quit; Escape or Go back shall leave it
+open. While a site, settings, import or delete dialog is open behind the
+choice, it shall say that unsaved work is lost by quitting and default to Go
+back. Closing the window shall quit on macOS and Linux; on Windows too while
+storage could not be opened. Exit and Quit shall stop monitoring.
+Verified by: `closing_test.go::TestCloseAsksOnlyWhereTheTrayCanBringTheWindowBack`
+and `frontend/src/components/CloseChoiceDialog.test.tsx`; the window itself by
+hand; the engine side by `TestStopCancelsAndWaits`.
 
-**FR-112 Sign-in start.** Where sign-in start is on, the application shall write
-`HKCU\...\Run\WebVigil` with the quoted path and `-hidden`; turned off, it shall
-remove it.
-Verified by: `internal/infrastructure/autostart/autostart_windows_test.go`
+**FR-112 Sign-in start.** Where sign-in start is on, the application shall
+write its one entry: on Windows `HKCU\...\Run\WebVigil` with the quoted path and
+`-hidden`, so it waits in the tray; on macOS a LaunchAgent in
+`~/Library/LaunchAgents`; on Linux an XDG autostart entry (inside the Flatpak,
+one that runs the installed app). Off Windows it opens the window. Turned off,
+it shall remove the entry.
+Verified by: `internal/infrastructure/autostart/autostart_windows_test.go` and
+`internal/infrastructure/autostart/entry_test.go`
 
 **FR-113 Restart.** After a restart the application shall hold the same sites,
 baselines, pending alerts and settings.
@@ -454,7 +472,7 @@ Verified by: `frontend/src/components/Toolbar.test.tsx`
 image in `assets/` by its file name.
 Verified by: `tests/structural/structural_test.go::TestSuppliedIconsAreUsed`
 
-### 3.13 Setup program
+### 3.13 Setup program (Windows)
 
 **FR-130 Per-user install.** The setup program shall install under
 `%LOCALAPPDATA%\Programs\WebVigil`, register under `HKCU` with Modify and
@@ -480,8 +498,9 @@ Verified by: `frontend/src/components/Menu.test.tsx`,
 
 **FR-141 Guide.** The Guide shall name every toolbar and row control with the
 picture it actually draws, show the status lights from their one definition and
-state the rules behind the behaviour.
-Verified by: `frontend/src/components/HelpDialogs.test.tsx`
+state the rules behind the behaviour as they hold on the platform it runs on.
+Verified by: `frontend/src/components/HelpDialogs.test.tsx`,
+`frontend/src/platform.test.ts`
 
 **FR-142 About and Licence.** About shall show the name, tagline, version,
 author, licence, run log path and open-source credits; Licence shall show the
@@ -533,9 +552,11 @@ be enforced by `tests/structural`.
 **NFR-MNT-003** No Go or TypeScript source file shall exceed 400 lines.
 
 **NFR-PRV-001** All data shall stay on the user's machine. WebVigil's own
-database and run log live under `%LOCALAPPDATA%\WebVigil`; the WebView2 runtime
-keeps the window's browser profile, which holds the skipped update version,
-under `%APPDATA%\WebVigil.exe`.
+database and run log live in its per-user data folder: `%LOCALAPPDATA%\WebVigil`
+on Windows, else the user configuration folder (`~/Library/Application
+Support/WebVigil` on macOS, `~/.var/app/uk.codecrafter.WebVigil/config/WebVigil`
+in the Flatpak). On Windows the WebView2 runtime keeps the window's browser
+profile, which holds the skipped update version, under `%APPDATA%\WebVigil.exe`.
 
 ## 5. Open questions
 

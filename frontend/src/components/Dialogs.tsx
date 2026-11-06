@@ -1,6 +1,7 @@
 import {useState} from 'react'
 import {api} from '../api'
 import {icons} from '../icons'
+import {platformWords} from '../platform'
 import type {ImportPreviewDTO, SettingsDTO} from '../wire'
 import {Modal} from './Modal'
 
@@ -44,7 +45,8 @@ export function ImportDialog({preview, onDone, onCancel}: {preview: ImportPrevie
 }
 
 // SettingsDialog edits the application settings.
-export function SettingsDialog({initial, onSaved, onCancel}: {initial: SettingsDTO; onSaved: () => void; onCancel: () => void}) {
+export function SettingsDialog({initial, platform, onSaved, onCancel}: {initial: SettingsDTO; platform: string; onSaved: () => void; onCancel: () => void}) {
+  const words = platformWords(platform)
   const [s, setS] = useState(initial)
   const [error, setError] = useState('')
   const set = <K extends keyof SettingsDTO>(k: K, v: SettingsDTO[K]) => setS((o) => ({...o, [k]: v}))
@@ -59,7 +61,7 @@ export function SettingsDialog({initial, onSaved, onCancel}: {initial: SettingsD
       <div className="form">
         <label htmlFor="s-theme">Appearance</label>
         <select id="s-theme" value={s.theme} onChange={(e) => set('theme', e.target.value)}>
-          <option value="system">Follow Windows</option><option value="light">Light</option><option value="dark">Dark</option>
+          <option value="system">{words.followSystem}</option><option value="light">Light</option><option value="dark">Dark</option>
         </select>
         <label htmlFor="s-sound">Alarm sound</label>
         <div className="checks">
@@ -72,7 +74,7 @@ export function SettingsDialog({initial, onSaved, onCancel}: {initial: SettingsD
         <div className="checks">
           <label><input type="checkbox" checked={s.repeatAlarm} onChange={(e) => set('repeatAlarm', e.target.checked)} /> Repeat the alarm until acknowledged</label>
           <label><input type="checkbox" checked={s.foregroundDialog} onChange={(e) => set('foregroundDialog', e.target.checked)} /> Bring WebVigil forward on a change</label>
-          <label><input type="checkbox" checked={s.startAtSignIn} onChange={(e) => set('startAtSignIn', e.target.checked)} /> Start WebVigil when I sign in to Windows</label>
+          <label><input type="checkbox" checked={s.startAtSignIn} onChange={(e) => set('startAtSignIn', e.target.checked)} /> {words.signIn}</label>
         </div>
       </div>
     </Modal>

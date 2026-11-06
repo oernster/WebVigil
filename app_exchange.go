@@ -188,6 +188,3 @@ func (a *App) TestSound(path string) error {
 	}
 	return svc.alerts.TestSound(path)
 }
-
-// Quit exits WebVigil completely.
-func (a *App) Quit() { runtime.Quit(a.ctx) }

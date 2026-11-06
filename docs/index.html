@@ -4,13 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>WebVigil: watch the web, know what changes</title>
-    <meta name="description" content="WebVigil checks the web pages you choose, tells you when their meaningful content changes and says plainly why a check failed. Local, deterministic, free. For Windows.">
+    <meta name="description" content="WebVigil checks the web pages you choose, tells you when their meaningful content changes and says plainly why a check failed. Local, deterministic, free. For Windows, macOS and Linux.">
     <meta name="theme-color" content="#061229">
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
     <meta property="og:type" content="website">
     <meta property="og:title" content="WebVigil: watch the web, know what changes">
-    <meta property="og:description" content="Checks the pages you choose, shows exactly what changed and says why a check failed. Everything stays on your computer. For Windows.">
+    <meta property="og:description" content="Checks the pages you choose, shows exactly what changed and says why a check failed. Everything stays on your computer. For Windows, macOS and Linux.">
     <meta property="og:image" content="https://ernster.dev/WebVigil/icon.png">
     <meta property="og:url" content="https://ernster.dev/WebVigil/">
     <link rel="canonical" href="https://ernster.dev/WebVigil/">
@@ -23,7 +23,7 @@
     <meta property="og:locale" content="en_GB">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="WebVigil: watch the web, know what changes">
-    <meta name="twitter:description" content="Checks the pages you choose, shows exactly what changed and says why a check failed. Everything stays on your computer. For Windows.">
+    <meta name="twitter:description" content="Checks the pages you choose, shows exactly what changed and says why a check failed. Everything stays on your computer. For Windows, macOS and Linux.">
     <meta name="twitter:image" content="https://ernster.dev/WebVigil/icon.png">
     <meta name="twitter:image:alt" content="WebVigil app icon">
     <link rel="stylesheet" href="styles.css">
@@ -33,7 +33,7 @@
         "@type": "SoftwareApplication",
         "name": "WebVigil",
         "applicationCategory": "UtilitiesApplication",
-        "operatingSystem": "Windows",
+        "operatingSystem": "Windows, macOS, Linux",
         "description": "Checks the web pages you choose and tells you when their meaningful content changes.",
         "author": {"@type": "Person", "name": "Oliver Ernster", "url": "https://ernster.dev"},
         "license": "https://www.gnu.org/licenses/gpl-3.0.html",
@@ -60,8 +60,8 @@
 
     <div class="wrap hero">
         <p class="eyebrow">
-            <span class="pill">v<!--VERSION-->0.1.0<!--/VERSION--></span>
-            <span class="pill">Windows</span>
+            <span class="pill">v<!--VERSION-->1.0.0<!--/VERSION--></span>
+            <span class="pill">Windows, macOS, Linux</span>
             <span class="pill">Free and open source</span>
         </p>
         <h1>Watch the web. <span class="accent">Know what changes.</span></h1>
@@ -70,7 +70,7 @@
             by line. When a check fails it says why, in words you can act on, instead of
             showing you an old page as if nothing were wrong.</p>
         <div class="cta">
-            <a class="btn btn-primary" href="#download">Download for Windows</a>
+            <a class="btn btn-primary" href="#download">Download</a>
             <a class="btn" href="https://github.com/oernster/WebVigil">View the source</a>
         </div>
         <figure class="shot shot-hero">
@@ -108,7 +108,7 @@
                     shortest. The first successful check becomes the baseline and raises
                     nothing.</li>
                 <li><strong>A change raises your alarm</strong>: a chime or your own sound, a
-                    Windows notification, either or both. The site turns amber and waits for you
+                    desktop notification, either or both. The site turns amber and waits for you
                     to acknowledge it, with the change shown as a line diff.</li>
                 <li><strong>A failure is named</strong>: DNS, a refused or timed-out connection,
                     TLS, the HTTP status, a missing selector, a challenge page. It never hides a
@@ -150,13 +150,15 @@
                         and case folded.</li>
                     <li><strong>Checks politely.</strong> At most four checks at once, one host
                         never asked twice within ten seconds, conditional requests when nothing
-                        changed and a back-off up to a day while a site keeps failing.</li>
+                        changed and a back-off of up to a day while a site keeps failing (or its
+                        own interval, for a site checked less often).</li>
                     <li><strong>Keeps the history.</strong> Every check with its outcome and
                         status; every change as a line diff or a list of changed fields.</li>
                     <li><strong>Imports and exports</strong> site definitions as JSON, previewed
                         first, with a site you already watch skipped unless you say otherwise.</li>
-                    <li><strong>Lives in the tray.</strong> Close the window and monitoring
-                        carries on; it can start when you sign in to Windows.</li>
+                    <li><strong>Stays out of the way.</strong> On Windows, closing the window
+                        asks whether to keep it running in the tray or to quit; on macOS and Linux
+                        it watches while its window is open. It can start when you sign in.</li>
                     <li><strong>Explains itself.</strong> A Guide to every control and rule, light
                         and dark appearance and a check for new versions.</li>
                 </ul>
@@ -175,7 +177,8 @@
                     <li><strong>Phone home.</strong> No telemetry and no accounts. Beyond the
                         pages you watch, its one request asks GitHub for its latest release,
                         carrying no identifier and nothing about your sites.</li>
-                    <li><strong>Run on macOS or Linux.</strong> Windows only.</li>
+                    <li><strong>Run as a background service.</strong> Checks run while WebVigil
+                        is running, never before you sign in.</li>
                 </ul>
             </div>
         </div>
@@ -184,9 +187,9 @@
     <section class="wrap" id="download">
         <p class="kicker">Download</p>
         <h2>Install it once. Stop refreshing.</h2>
-        <span class="dl-version" id="dl-version">Version <!--VERSION-->0.1.0<!--/VERSION--></span>
+        <span class="dl-version" id="dl-version">Version <!--VERSION-->1.0.0<!--/VERSION--></span>
         <!--
-            The button points at GitHub's releases/latest/download redirect, which always
+            Each button points at GitHub's releases/latest/download redirect, which always
             serves the newest release's file. The name carries no version, so the link
             cannot go stale. The script at the foot adds the file size when it can reach
             the API; without it the page still says everything that matters.
@@ -204,6 +207,24 @@
                     so Windows never asks for administrator rights. Running it again offers
                     Update, Go back or Repair, with Uninstall beside each; uninstalling keeps
                     your websites and history unless you ask for them to be deleted.</p>
+            </div>
+            <div class="dl-card">
+                <div class="ico"><img src="icon.png" alt="" width="48" height="48"></div>
+                <h3>macOS</h3>
+                <p class="req">Apple Silicon (M1 or later)</p>
+                <a class="btn btn-primary" href="https://github.com/oernster/WebVigil/releases/latest/download/WebVigil.dmg">Download for macOS</a>
+                <p class="meta" data-asset="WebVigil.dmg">Disk image (.dmg)</p>
+                <p class="meta">Signed and notarised with Apple, so it opens without warnings.</p>
+                <p class="how-to">Open the disk image and drag WebVigil into Applications.</p>
+            </div>
+            <div class="dl-card">
+                <div class="ico"><img src="icon.png" alt="" width="48" height="48"></div>
+                <h3>Linux</h3>
+                <p class="req">Any distribution with Flatpak</p>
+                <a class="btn btn-primary" href="https://github.com/oernster/WebVigil/releases/latest/download/webvigil.flatpak">Download for Linux</a>
+                <p class="meta" data-asset="webvigil.flatpak">Flatpak bundle (.flatpak)</p>
+                <p class="how-to">Install it with <code>flatpak install --user webvigil.flatpak</code>;
+                    the runtime it needs comes from Flathub.</p>
             </div>
         </div>
         <p class="dl-links">

@@ -16,12 +16,12 @@ const LIGHT_ORDER = Object.keys(lightInfo) as Light[]
 const closeButton = (onClose: () => void) => <button className="btn primary" onClick={onClose}>Close</button>
 
 // GuideDialog names the furniture with its real pictures, then the rules behind the behaviour. Its
-// words live in guideContent.ts; this only draws them.
-export function GuideDialog({onClose}: {onClose: () => void}) {
+// words live in guideContent.ts; this only draws them, for the platform the window runs on.
+export function GuideDialog({platform, onClose}: {platform: string; onClose: () => void}) {
   const autoScroll = useAutoScroll()
   return (
     <Modal title="How WebVigil works" icon={icons.helpAbout} variant="guide" bodyRef={autoScroll} onClose={onClose} footer={closeButton(onClose)}>
-      {guideSections.map((section) => (
+      {guideSections(platform).map((section) => (
         <section className="guide-section" key={section.heading}>
           <h3 className="guide-heading">{section.heading}</h3>
           {section.intro && <p className="guide-intro">{section.intro}</p>}

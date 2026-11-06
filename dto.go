@@ -79,6 +79,8 @@ type AppStateDTO struct {
 	LogPath  string      `json:"logPath"`
 	Settings SettingsDTO `json:"settings"`
 	Toasts   bool        `json:"toasts"`
+	// Platform is "windows", "macos" or "linux"; only Windows has a tray to keep running in.
+	Platform string `json:"platform"`
 }
 
 // CreditDTO names one open-source component and its licence for Help > About.

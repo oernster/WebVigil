@@ -18,23 +18,31 @@ const status = (over: Partial<UpdateStatusDTO>): UpdateStatusDTO => ({
 
 describe('GuideDialog', () => {
   it('draws every section and each entry with its real picture', () => {
-    const {container} = render(<GuideDialog onClose={() => undefined} />)
-    for (const section of guideSections) expect(screen.getByText(section.heading)).toBeInTheDocument()
+    const {container} = render(<GuideDialog platform="windows" onClose={() => undefined} />)
+    for (const section of guideSections('windows')) expect(screen.getByText(section.heading)).toBeInTheDocument()
     const pictures = Array.from(container.querySelectorAll('img.guide-icon')).map((i) => i.getAttribute('src'))
-    for (const entry of guideSections.flatMap((s) => s.entries ?? [])) expect(pictures).toContain(entry.icon)
+    for (const entry of guideSections('windows').flatMap((s) => s.entries ?? [])) expect(pictures).toContain(entry.icon)
     expect(pictures).toContain(icons.helpAbout)
   })
   it('draws the status lights from their one home', () => {
-    render(<GuideDialog onClose={() => undefined} />)
+    render(<GuideDialog platform="windows" onClose={() => undefined} />)
     for (const info of Object.values(lightInfo)) {
       expect(screen.getByText(info.label)).toBeInTheDocument()
       expect(screen.getByText(`${info.meaning}.`)).toBeInTheDocument()
     }
   })
   it('opens on Close and the body takes no focus (a pane is not a stop)', () => {
-    const {container} = render(<GuideDialog onClose={() => undefined} />)
+    const {container} = render(<GuideDialog platform="windows" onClose={() => undefined} />)
     expect(document.activeElement).toHaveTextContent('Close')
     expect(container.querySelector('.content')).not.toHaveAttribute('tabindex')
+  })
+  it('tells each platform what closing the window does', () => {
+    const {unmount} = render(<GuideDialog platform="windows" onClose={() => undefined} />)
+    expect(screen.getByText(/minimise WebVigil to the tray or to quit/)).toBeInTheDocument()
+    unmount()
+    render(<GuideDialog platform="linux" onClose={() => undefined} />)
+    expect(screen.getByText(/Closing the window quits WebVigil/)).toBeInTheDocument()
+    expect(screen.queryByText(/tray/)).toBeNull()
   })
 })
 

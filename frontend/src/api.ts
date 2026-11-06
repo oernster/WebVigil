@@ -72,6 +72,7 @@ export const api = {
   chooseSound: (r: Refused) => call<string>('ChooseSound', [], r),
   testSound: (path: string, r: Refused) => okCall('TestSound', [path], r),
   quit: (r: Refused) => okCall('Quit', [], r),
+  minimiseToTray: (r: Refused) => okCall('MinimiseToTray', [], r),
   about: (r: Refused) => call<AboutDTO>('About', [], r),
   licenceText: (r: Refused) => call<string>('LicenceText', [], r),
   checkForUpdates: (skippedVersion: string, r: Refused) => call<UpdateStatusDTO>('CheckForUpdates', [skippedVersion], r),

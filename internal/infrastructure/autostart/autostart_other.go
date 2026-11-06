@@ -1,14 +1,11 @@
-//go:build !windows
+//go:build !windows && !darwin && !linux
 
 package autostart
 
 import "errors"
 
-// Registry is unavailable off Windows.
-type Registry struct{}
-
-// New returns the unavailable entry.
-func New() Registry { return Registry{} }
-
-// Set reports that sign-in start is a Windows feature.
-func (Registry) Set(bool) error { return errors.New("start at sign-in is available on Windows only") }
+// New returns an entry that reports sign-in start is unavailable: WebVigil writes one for Windows,
+// macOS and Linux only.
+func New() Entry {
+	return Entry{err: errors.New("start at sign-in is available on Windows, macOS and Linux only")}
+}

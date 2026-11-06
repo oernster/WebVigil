@@ -65,6 +65,8 @@ export interface AppStateDTO {
   logPath: string
   settings: SettingsDTO
   toasts: boolean
+  // platform is 'windows', 'macos' or 'linux'; only Windows has a tray to keep running in.
+  platform: string
 }
 
 export interface CheckDTO {

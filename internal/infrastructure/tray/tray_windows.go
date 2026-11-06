@@ -27,6 +27,10 @@ type Tray struct {
 	done     chan struct{}
 }
 
+// HidesToTray reports that a hidden window can be brought back: here the tray icon's Open does it,
+// so closing the window may offer to keep WebVigil running in the tray.
+const HidesToTray = true
+
 // activeTray is reached by the window procedure, a C callback that cannot carry a receiver. There
 // is one tray per process.
 var activeTray *Tray

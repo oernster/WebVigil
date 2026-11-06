@@ -1,6 +1,7 @@
 import {useCallback, useEffect, useMemo, useState} from 'react'
 import {api, onEvent} from './api'
 import {BottomBar} from './components/BottomBar'
+import {CloseChoiceDialog} from './components/CloseChoiceDialog'
 import {ConfirmDelete} from './components/ConfirmDelete'
 import {Details} from './components/Details'
 import {ImportDialog, SettingsDialog} from './components/Dialogs'
@@ -25,6 +26,9 @@ type Dialog =
   | {kind: 'licence'; name: string; text: string}
   | null
 
+// EDITING_DIALOGS hold changes not yet saved, which quitting from the close choice would lose.
+const EDITING_DIALOGS = new Set(['site', 'delete', 'import', 'settings'])
+
 export function App() {
   const [state, setState] = useState<AppStateDTO | null>(null)
   const [sites, setSites] = useState<SiteDTO[]>([])
@@ -35,6 +39,8 @@ export function App() {
   const [version, setVersion] = useState(0)
   const [now, setNow] = useState(() => new Date())
   const [systemDark, setSystemDark] = useState(() => window.matchMedia?.(DARK_QUERY).matches ?? true)
+  // closeChoice is open after the window's close button was pressed on Windows (closing.go).
+  const [closeChoice, setCloseChoice] = useState(false)
 
   const fail = useCallback((text: string) => setMessage({text, error: true}), [])
   const reload = useCallback(async () => {
@@ -53,6 +59,7 @@ export function App() {
       onEvent('webvigil:changed', () => reload()),
       onEvent('webvigil:problem', (t) => fail(String(t))),
       onEvent('webvigil:show-changes', (id) => { setSelected(Number(id)); setTab('changes') }),
+      onEvent('webvigil:close-request', () => setCloseChoice(true)),
     ]
     const timer = window.setInterval(() => setNow(new Date()), CLOCK_TICK_MS)
     const mq = window.matchMedia?.(DARK_QUERY)
@@ -129,12 +136,17 @@ export function App() {
         onDisableInstead={() => { api.setEnabled(dialog.site.id, false, fail).then(reload); close() }} />}
       {dialog?.kind === 'import' && <ImportDialog preview={dialog.preview} onCancel={close}
         onDone={(text) => { close(); setMessage({text, error: false}); reload() }} />}
-      {dialog?.kind === 'settings' && state && <SettingsDialog initial={state.settings} onCancel={close} onSaved={() => { close(); reload() }} />}
-      {dialog?.kind === 'guide' && <GuideDialog onClose={close} />}
+      {dialog?.kind === 'settings' && state && <SettingsDialog initial={state.settings} platform={state.platform}
+        onCancel={close} onSaved={() => { close(); reload() }} />}
+      {dialog?.kind === 'guide' && <GuideDialog platform={state?.platform ?? ''} onClose={close} />}
       {dialog?.kind === 'about' && <AboutDialog about={dialog.about} onClose={close} />}
       {dialog?.kind === 'licence' && <LicenceDialog name={dialog.name} text={dialog.text} onClose={close} />}
       {updates.updateStatus && <UpdateDialog status={updates.updateStatus} onClose={updates.closeUpdate}
         onSkip={updates.skipUpdate} onDownload={(url) => api.openExternal(url, fail)} />}
+      {closeChoice && <CloseChoiceDialog workOpen={dialog !== null && EDITING_DIALOGS.has(dialog.kind)}
+        onCancel={() => setCloseChoice(false)}
+        onMinimise={() => { setCloseChoice(false); api.minimiseToTray(fail) }}
+        onQuit={() => { setCloseChoice(false); api.quit(fail) }} />}
     </div>
   )
 }

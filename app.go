@@ -7,6 +7,7 @@ import (
 	"log"
 	"strings"
 	"sync"
+	"sync/atomic"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 
@@ -38,8 +39,11 @@ type App struct {
 	version string
 	logPath string
 	problem string
-	svc     *services
-	tray    *tray.Tray
+	// platform is the release platform key (application.PlatformWindows and its siblings), so the
+	// page can word what differs: the tray, sign-in start and the theme that follows the system.
+	platform string
+	svc      *services
+	tray     *tray.Tray
 	// updates is built apart from svc: the update check needs no storage, so it still answers when
 	// WebVigil's data could not be opened.
 	updates *application.UpdateService
@@ -47,6 +51,9 @@ type App struct {
 	ctx    context.Context
 	stop   context.CancelFunc
 	toasts bool
+	// quitting is set once an explicit Quit is under way, so the close button's choice is not
+	// offered again on the way out.
+	quitting atomic.Bool
 
 	mu      sync.Mutex
 	pending map[string]application.ImportPreview // import previews awaiting confirmation, by path
@@ -76,7 +83,7 @@ func (a *App) startup(ctx context.Context) {
 		Open:           a.showWindow,
 		RefreshAll:     func() { _, _ = a.RefreshAll() },
 		TogglePause:    func() { _ = a.SetPaused(!a.svc.settings.Current().Paused) },
-		Exit:           func() { runtime.Quit(a.ctx) },
+		Exit:           a.Quit,
 		BalloonClicked: a.showWindow,
 	})
 	runCtx, stop := context.WithCancel(context.Background())
@@ -120,7 +127,7 @@ func (a *App) showWindow() {
 
 // State returns what the page needs first, including any startup problem.
 func (a *App) State() AppStateDTO {
-	st := AppStateDTO{Version: a.version, Problem: a.problem, LogPath: a.logPath, Toasts: a.toasts}
+	st := AppStateDTO{Version: a.version, Problem: a.problem, LogPath: a.logPath, Toasts: a.toasts, Platform: a.platform}
 	if a.svc != nil {
 		st.Settings = settingsDTO(a.svc.settings.Current())
 	} else {

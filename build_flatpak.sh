@@ -147,6 +147,10 @@ printf '%s\n' \
     "  # Import and Export open the toolkit's own file dialog inside the sandbox." \
     "  - --filesystem=home" \
     "  - --talk-name=org.freedesktop.Notifications" \
+    "  # The alarm plays through the desktop's sound server: PulseAudio or PipeWire's Pulse server." \
+    "  - --socket=pulseaudio" \
+    "  # Start at sign-in writes its entry to the host's autostart folder, which the desktop reads." \
+    "  - --filesystem=xdg-config/autostart:create" \
     "  # The Wails single-instance lock; see the Single-instance bus name step in build_flatpak.sh." \
     "  - --own-name=${SINGLE_INSTANCE_NAME}" \
     "build-options:" \

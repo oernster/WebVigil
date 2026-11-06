@@ -62,25 +62,27 @@ func main() {
 	}
 	hidden := slices.Contains(os.Args[1:], autostart.HiddenFlag)
 	app := newApp(appVersion, logPath)
-	app.updates = application.NewUpdateService(
-		update.NewGitHubReleaseSource(releaseRepo), appVersion, application.PlatformKeyFor(runtime.GOOS))
+	app.platform = application.PlatformKeyFor(runtime.GOOS)
+	app.updates = application.NewUpdateService(update.NewGitHubReleaseSource(releaseRepo), appVersion, app.platform)
 	if err := compose(app, dataDir); err != nil {
 		// Never end the run before the window opens: the problem is carried into it (FR-115).
 		app.problem = fmt.Sprintf("WebVigil could not open its data in %s: %v", dataDir, err)
 		log.Print(app.problem)
 	}
 	err := wails.Run(&options.App{
-		Title:             productName,
-		Width:             windowWidth,
-		Height:            windowHeight,
-		MinWidth:          minWidth,
-		MinHeight:         minHeight,
-		StartHidden:       hidden,
-		HideWindowOnClose: true,
-		BackgroundColour:  &options.RGBA{R: bgRed, G: bgGreen, B: bgBlue, A: bgAlpha},
-		AssetServer:       &assetserver.Options{Assets: assets},
-		OnStartup:         app.startup,
-		OnShutdown:        app.shutdown,
+		Title:     productName,
+		Width:     windowWidth,
+		Height:    windowHeight,
+		MinWidth:  minWidth,
+		MinHeight: minHeight,
+		// A sign-in start waits hidden only where the tray can bring the window back.
+		StartHidden:      hidden && tray.HidesToTray,
+		BackgroundColour: &options.RGBA{R: bgRed, G: bgGreen, B: bgBlue, A: bgAlpha},
+		AssetServer:      &assetserver.Options{Assets: assets},
+		OnStartup:        app.startup,
+		// The close button asks on Windows (Minimise to Tray or Quit) and quits elsewhere; see beforeClose.
+		OnBeforeClose: app.beforeClose,
+		OnShutdown:    app.shutdown,
 		SingleInstanceLock: &options.SingleInstanceLock{
 			UniqueId:               instanceID,
 			OnSecondInstanceLaunch: func(options.SecondInstanceData) { app.showWindow() },
