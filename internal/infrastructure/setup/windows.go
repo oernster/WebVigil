@@ -222,10 +222,11 @@ func RemoveRegistration() {
 	_ = registry.DeleteKey(registry.CURRENT_USER, toastCategoriesKey)
 }
 
-// ScheduleRemoval removes the program folder after setup exits, since setup's own maintenance copy
-// lives in it and cannot delete itself while running.
-func ScheduleRemoval(dir string) error {
-	cmd := exec.Command("cmd", "/C", fmt.Sprintf(`ping 127.0.0.1 -n 3 >nul & rmdir /s /q "%s"`, dir))
+// ScheduleRemoval removes the given folders after setup exits: the program folder holds setup's own
+// maintenance copy and setup's WebView2 profile is in use by its window, so neither can go while
+// setup runs.
+func ScheduleRemoval(dirs ...string) error {
+	cmd := exec.Command("cmd", "/C", RemovalCommand(dirs))
 	cmd.SysProcAttr = hidden()
 	return cmd.Start()
 }

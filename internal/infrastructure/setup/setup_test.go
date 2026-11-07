@@ -112,6 +112,34 @@ func TestRemoveDataRemovesTheProfileToo(t *testing.T) {
 	}
 }
 
+// TestRemovalWaitsThenRemovesEveryFolder: the command pauses before deleting, so setup has exited
+// and let go of its folders, then removes each one, quoted for paths with spaces.
+func TestRemovalWaitsThenRemovesEveryFolder(t *testing.T) {
+	got := RemovalCommand([]string{`C:\Program Dir\WebVigil`, `C:\Roaming\WebVigilSetup.exe`})
+	want := removalWait + ` & rmdir /s /q "C:\Program Dir\WebVigil" & rmdir /s /q "C:\Roaming\WebVigilSetup.exe"`
+	if got != want {
+		t.Errorf("RemovalCommand = %s\nwant           %s", got, want)
+	}
+}
+
+// TestSetupProfileFollowsTheRunningExecutable: WebView2 names the profile after the executable, so
+// a setup saved under another name still finds its own.
+func TestSetupProfileFollowsTheRunningExecutable(t *testing.T) {
+	roaming := t.TempDir()
+	t.Setenv("APPDATA", roaming)
+	exe, err := os.Executable()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, _ := SetupProfileDir(); got != filepath.Join(roaming, filepath.Base(exe)) {
+		t.Errorf("SetupProfileDir = %s", got)
+	}
+	t.Setenv("APPDATA", "")
+	if _, err := SetupProfileDir(); err == nil {
+		t.Error("no APPDATA was accepted")
+	}
+}
+
 func TestCompareVersions(t *testing.T) {
 	cases := []struct {
 		a, b string

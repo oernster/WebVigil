@@ -43,6 +43,7 @@ func (a *App) startup(ctx context.Context) {
 
 // StateDTO is the one reading of the machine the page decides everything from.
 type StateDTO struct {
+	Name          string        `json:"name"`
 	Route         setup.Route   `json:"route"`
 	Words         setup.Wording `json:"words"`
 	ThisVersion   string        `json:"thisVersion"`
@@ -62,7 +63,7 @@ type Options struct {
 func (a *App) State() StateDTO {
 	m := a.machine
 	r := setup.DecideRoute(m.Installed, m.InstalledVersion, a.version)
-	return StateDTO{Route: r, Words: setup.Words(r, m.InstalledVersion, a.version), ThisVersion: a.version,
+	return StateDTO{Name: setup.AppName, Route: r, Words: setup.Words(r, m.InstalledVersion, a.version), ThisVersion: a.version,
 		Machine: m, UninstallOnly: a.uninstall, LogPath: logPath()}
 }
 
@@ -127,7 +128,13 @@ func (a *App) Uninstall(removeData bool) error {
 			}
 			return setup.RemoveData()
 		},
-		func() error { return setup.ScheduleRemoval(dir) },
+		func() error {
+			// Setup's own profile goes with the program; it holds nothing of the user's.
+			if profile, err := setup.SetupProfileDir(); err == nil {
+				return setup.ScheduleRemoval(dir, profile)
+			}
+			return setup.ScheduleRemoval(dir)
+		},
 	}
 	return a.run(log, setup.RemoveSteps, steps)
 }

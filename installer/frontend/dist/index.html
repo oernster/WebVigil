@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>WebVigil Setup</title>
+<title>Setup</title>
 <style>
 /* Colours sampled from application-icon.png, as in the app's theme.css. Light and dark each name
    their own accent and ring: the artwork's bright cyan and green fail against white. Ring model:
@@ -75,8 +75,8 @@ label.option:focus-within { outline: 2px solid var(--ring); outline-offset: 3px;
 <div id="Shell">
   <span id="sink" tabindex="-1"></span>
   <header>
-    <img class="mark" src="icon.png" alt="WebVigil"/>
-    <div class="names"><div class="name">WebVigil</div><div class="tagline">Watch the web. Know what changes.</div></div>
+    <img class="mark" id="mark" src="icon.png" alt=""/>
+    <div class="names"><div class="name"><span class="app-name"></span></div><div class="tagline">Watch the web. Know what changes.</div></div>
     <button class="text" id="licence-btn">Licence</button>
     <button class="toggle" id="theme-btn"><img id="theme-img" alt=""/></button>
   </header>
@@ -87,19 +87,19 @@ label.option:focus-within { outline: 2px solid var(--ring); outline-offset: 3px;
       <div class="flow" id="route-flow" hidden><span class="from" id="flow-from"></span><span class="arrow">&rarr;</span><span class="to" id="flow-to"></span></div>
       <p class="lead" id="route-lead"></p>
       <div class="where" id="route-where"></div>
-      <label class="option"><input type="checkbox" id="opt-startmenu"/> Add WebVigil to the Start menu</label>
+      <label class="option"><input type="checkbox" id="opt-startmenu"/> Add <span class="app-name"></span> to the Start menu</label>
       <label class="option"><input type="checkbox" id="opt-desktop"/> Add a desktop shortcut</label>
-      <label class="option"><input type="checkbox" id="opt-signin"/> Start WebVigil when I sign in, waiting in the tray</label>
-      <label class="option"><input type="checkbox" id="opt-launch"/> Open WebVigil when setup finishes</label>
+      <label class="option"><input type="checkbox" id="opt-signin"/> Start <span class="app-name"></span> when I sign in, waiting in the tray</label>
+      <label class="option"><input type="checkbox" id="opt-launch"/> Open <span class="app-name"></span> when setup finishes</label>
     </section>
     <section class="screen" id="screen-uninstall">
-      <h1>Remove WebVigil?</h1>
+      <h1>Remove <span class="app-name"></span>?</h1>
       <p class="lead">This removes the program, its shortcuts, its sign-in entry and its notification registration.</p>
       <label class="option"><input type="checkbox" id="opt-data"/> Also delete my websites, their history and settings (cannot be undone)</label>
     </section>
     <section class="screen" id="screen-running">
-      <h1>WebVigil is open</h1>
-      <p class="lead">WebVigil must close before setup can continue. Your websites and history are not affected.</p>
+      <h1><span class="app-name"></span> is open</h1>
+      <p class="lead"><span class="app-name"></span> must close before setup can continue. Your websites and history are not affected.</p>
     </section>
     <section class="screen" id="screen-progress">
       <h1 id="progress-title"></h1>
@@ -173,14 +173,14 @@ function verdict(ok, title, line) {
   actions([{label: 'Close', kind: 'Primary', run: () => go().Quit()}])
 }
 
-// Ask whether WebVigil is running BEFORE any file is touched.
+// Ask whether the application is running BEFORE any file is touched.
 async function whenClosed(then) {
   if (!(await go().AppRunning())) return then()
   show('running')
   actions([
     {label: 'Cancel', run: () => routeScreen()},
     {label: 'Close it and continue', kind: 'Primary', run: async () => {
-      try { await go().CloseApp() } catch (e) { return verdict(false, 'WebVigil is still open', String(e)) }
+      try { await go().CloseApp() } catch (e) { return verdict(false, state.name + ' is still open', String(e)) }
       then()
     }},
   ])
@@ -202,9 +202,9 @@ async function perform(title, work, doneTitle, doneLine, launch) {
       await go().Launch()
       // Bring the new window forward first, then close setup, so it does not only flash on the taskbar.
       setTimeout(() => go().Quit(), LAUNCH_WAIT_MS)
-      return verdict(true, doneTitle, 'WebVigil is starting.')
+      return verdict(true, doneTitle, state.name + ' is starting.')
     } catch (e) {
-      return verdict(false, 'Installed; WebVigil did not start', String(e))
+      return verdict(false, 'Installed; ' + state.name + ' did not start', String(e))
     }
   }
   verdict(true, doneTitle, doneLine)
@@ -231,9 +231,9 @@ function routeScreen() {
   for (const id of ['opt-startmenu', 'opt-desktop', 'opt-signin']) {
     $(id).onchange = manage ? () => go().ApplyOption(options()).catch((e) => verdict(false, 'The change was not applied', String(e))) : null
   }
-  const doneTitle = {install: 'WebVigil is installed', update: 'WebVigil is updated', downgrade: 'WebVigil has gone back', manage: 'Repair complete'}[state.route]
+  const doneTitle = {install: state.name + ' is installed', update: state.name + ' is updated', downgrade: state.name + ' has gone back', manage: 'Repair complete'}[state.route]
   const go_ = () => whenClosed(() => perform(w.action + '…', () => go().Install(options()), doneTitle,
-    'You can open WebVigil from the Start menu.', $('opt-launch').checked))
+    'You can open ' + state.name + ' from the Start menu.', $('opt-launch').checked))
   const list = []
   if (m.installed) list.push({label: 'Uninstall', kind: 'Danger', left: true, run: uninstallScreen})
   list.push({label: 'Close', run: () => go().Quit()})
@@ -247,8 +247,8 @@ function uninstallScreen() {
   $('opt-data').checked = false
   actions([
     {label: 'Cancel', run: () => state.uninstallOnly ? go().Quit() : routeScreen()},
-    {label: 'Uninstall', kind: 'Danger', run: () => whenClosed(() => perform('Removing WebVigil', () => go().Uninstall($('opt-data').checked),
-      'WebVigil is removed', $('opt-data').checked ? 'Its websites and history were deleted too.' : 'Your websites and history were kept.'))},
+    {label: 'Uninstall', kind: 'Danger', run: () => whenClosed(() => perform('Removing ' + state.name, () => go().Uninstall($('opt-data').checked),
+      state.name + ' is removed', $('opt-data').checked ? 'Its websites and history were deleted too.' : 'Your websites and history were kept.'))},
   ])
 }
 
@@ -278,6 +278,10 @@ async function init() {
   if (!(window.go && window.go.main)) return verdict(false, 'Setup could not start', 'The setup window could not reach its own program.')
   window.runtime.EventsOn('progress', (p) => { $('bar-fill').style.width = p.pct + '%'; $('progress-step').textContent = p.step })
   state = await go().State()
+  // The product name arrives on state; the page names it nowhere itself.
+  document.title = state.name + ' Setup'
+  $('mark').alt = state.name
+  document.querySelectorAll('.app-name').forEach((e) => { e.textContent = state.name })
   if (state.uninstallOnly && state.machine.installed) uninstallScreen()
   else routeScreen()
   $('sink').focus() // neutral start: nothing wears a ring until Tab is pressed

@@ -66,6 +66,33 @@ func ProfileDir() (string, error) {
 	return filepath.Join(base, ExeName), nil
 }
 
+// SetupProfileDir is the running setup program's own WebView2 profile: %APPDATA% joined with the
+// executable's file name, whatever the user saved the download as.
+func SetupProfileDir() (string, error) {
+	base := os.Getenv("APPDATA")
+	if base == "" {
+		return "", fmt.Errorf("APPDATA is not set")
+	}
+	exe, err := os.Executable()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(base, filepath.Base(exe)), nil
+}
+
+// removalWait pauses the removal command (ping sends one probe a second, the first at once) so
+// setup has exited and released its folders before they are deleted.
+const removalWait = "ping 127.0.0.1 -n 3 >nul"
+
+// RemovalCommand is the cmd line that waits for setup to exit, then deletes each folder.
+func RemovalCommand(dirs []string) string {
+	parts := []string{removalWait}
+	for _, d := range dirs {
+		parts = append(parts, fmt.Sprintf(`rmdir /s /q "%s"`, d))
+	}
+	return strings.Join(parts, " & ")
+}
+
 // RemoveData deletes everything WebVigil keeps about the user: the data folder and the window's
 // profile. A folder already gone is not an error.
 func RemoveData() error {
