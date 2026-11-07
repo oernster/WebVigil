@@ -18,9 +18,9 @@ Dependencies point inward. Each rule below is held by a test in
 | Every supplied icon master is present and used | `TestSuppliedIconsAreUsed` |
 | No shipped file names a particular person or their test data | `TestNoUserSpecificData` |
 | No pane or text view wears a focus ring; the browser's own ring stays off scrollers | `TestNoPaneWearsARing`, `TestTheBrowserRingStaysOffScrollers` |
-
-Two rules hold by convention only: only package `main` builds both layers
-together; only `fetch` and `update` open connections (see Network).
+| Only package `main` at the root imports both application and infrastructure | `TestCompositionRootIsWhitelisted` |
+| Only `fetch` and `update` import a package that opens a connection; elsewhere `net/http` may be used for its status names alone | `TestOnlyTheListedPackagesReachTheNetwork`, `TestEveryNetworkExemptionExists` |
+| The page makes no request of its own: no `fetch`, `XMLHttpRequest`, `WebSocket`, `EventSource` or `sendBeacon` in `frontend/src` | `TestTheFrontEndMakesNoRequestOfItsOwn` |
 
 ## Layers
 
@@ -96,6 +96,8 @@ so retention chooses what to keep.
 | `update` | the GitHub latest-release endpoint of the repository the build was stamped with |
 
 Opening a site, a download or the donate page hands the address to the browser.
+The tests above hold this list over the source; they cannot see a request the
+web view makes on its own account.
 
 ## Platforms
 

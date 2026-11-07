@@ -40,8 +40,9 @@ A page test that needs Go puts a stand-in for the one binding it uses on
 ## Structural tests
 
 `tests/structural/` reads the source rather than running it: layering, the
-clock rule, the module-size cap, the wire contract, the icons, user-specific
-data and the focus-ring rules. The table is in
+clock rule, the composition root, the network list, the page's own requests,
+the module-size cap, the wire contract, the icons, user-specific data and the
+focus-ring rules. The table is in
 [ARCHITECTURE.md](ARCHITECTURE.md). `TestThePaneScanBites` plants a violation to
 prove the focus scan fails on one.
 
