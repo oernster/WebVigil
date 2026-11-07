@@ -1,4 +1,4 @@
-import {DEFAULT_MODE, filledForm, mergeLines, readingNote} from './reading'
+import {DEFAULT_MODE, filledForm, mergeLines, readingNote, SAVE_FIRST} from './reading'
 import type {ReadingDTO, SiteFormDTO} from './wire'
 
 const form: SiteFormDTO = {
@@ -38,7 +38,11 @@ describe('mergeLines', () => {
 
 describe('readingNote', () => {
   it('names the reading and says what it leaves out', () => {
-    expect(readingNote('Shop product page')).toMatch(/^Shop product page: only these fields are compared/)
-    expect(readingNote('x')).toContain('adverts and menus')
+    expect(readingNote('Shop product page', false)).toMatch(/^Shop product page: only these fields are compared/)
+    expect(readingNote('x', false)).toContain('adverts and menus')
+    expect(readingNote('x', false)).not.toContain(SAVE_FIRST)
+  })
+  it('tells an existing site its fields are not in use until it is saved', () => {
+    expect(readingNote('x', true).endsWith(SAVE_FIRST)).toBe(true)
   })
 })

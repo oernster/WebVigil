@@ -62,6 +62,7 @@ describe('SiteDialog ready-made readings', () => {
     expect(text('Exclude selectors')).toBe('.rank')
     expect(text('Exclude patterns')).toBe('x+')
     expect(screen.getByText(/^Shop product page: only these fields are compared/)).toBeInTheDocument()
+    expect(screen.queryByText(/Not saved yet/)).not.toBeInTheDocument()
   })
 
   it('fills an existing text-mode definition in when it opens, keeping its own rules', async () => {
@@ -70,6 +71,7 @@ describe('SiteDialog ready-made readings', () => {
     await settle()
     expect(mode()).toBe('structured_fields')
     expect(text('Exclude selectors')).toBe('.mine\n.rank')
+    expect(screen.getByText(/Not saved yet: press Save to compare these fields instead of the whole page\.$/)).toBeInTheDocument()
   })
 
   it('changes nothing for a page it has no reading for', async () => {

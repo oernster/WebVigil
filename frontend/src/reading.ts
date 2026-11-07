@@ -19,8 +19,15 @@ export function mergeLines(text: string, rules: string[]): string {
   return [...have, ...rules.filter((r) => !have.includes(r))].join('\n')
 }
 
-// readingNote tells the user what was filled in and why, under the detection mode.
-export function readingNote(name: string): string {
-  return `${name}: only these fields are compared, so adverts and menus that change on every visit ` +
+// SAVE_FIRST closes the note on an existing site: the fields are filled in when its dialog opens
+// but the stored definition keeps its old reading until Save, so a refresh in between still
+// compares the whole page.
+export const SAVE_FIRST = 'Not saved yet: press Save to compare these fields instead of the whole page.'
+
+// readingNote tells the user what was filled in and why, under the detection mode; unsaved adds
+// that an existing site goes on with its old reading until it is saved.
+export function readingNote(name: string, unsaved: boolean): string {
+  const note = `${name}: only these fields are compared, so adverts and menus that change on every visit ` +
     'never count as a change. Edit or remove any of them.'
+  return unsaved ? `${note} ${SAVE_FIRST}` : note
 }

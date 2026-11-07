@@ -116,7 +116,7 @@ export function SiteDialog({initial, onSaved, onCancel}: Props) {
         <select id="f-mode" value={f.mode} onChange={(e) => set('mode', e.target.value)}>
           {MODES.map(([v, t]) => <option key={v} value={v}>{t}</option>)}
         </select>
-        {filledFrom && f.mode === 'structured_fields' && <p className="hint">{readingNote(filledFrom)}</p>}
+        {filledFrom && f.mode === 'structured_fields' && <p className="hint">{readingNote(filledFrom, editing)}</p>}
         {f.mode === 'css_selector' && <>
           <label htmlFor="f-sel">CSS selectors</label>
           <textarea id="f-sel" value={selectors} onChange={(e) => setSelectors(e.target.value)} placeholder="One per line; each must match" />
