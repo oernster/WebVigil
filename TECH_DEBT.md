@@ -2,12 +2,7 @@
 
 Open debt only. Each item names where it is in the code; delete it once fixed.
 
-## 1. Setup's removal weights are estimates
-
-`internal/infrastructure/setup/route.go` weights the install steps by their
-median times in `setup.log`. No uninstall has been timed, so the removal steps
-still carry starting estimates. Replace them from the step log of a real
-uninstall.
+No open debt.
 
 ## Not debt (do not "fix" these)
 

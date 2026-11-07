@@ -157,4 +157,8 @@ func TestProgress(t *testing.T) {
 	if p := Progress(InstallSteps, 3); p != 100 {
 		t.Errorf("progress after the shortcuts = %d, want 100", p)
 	}
+	// Removal: scheduling the program files' removal is the longest step, so it moves the bar most.
+	if p := Progress(RemoveSteps, 3); p >= 50 {
+		t.Errorf("removal progress before the program files = %d, want under 50", p)
+	}
 }

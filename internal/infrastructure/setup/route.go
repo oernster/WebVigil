@@ -62,13 +62,13 @@ type Step struct {
 	Weight int    `json:"weight"`
 }
 
-// The bar is weighted by time, not by step count. The install weights are each step's median
-// time in milliseconds over twelve installs recorded in setup.log: the shortcut calls (one
-// PowerShell process each) take nearly all of it. No removal has been timed yet, so its weights
-// are still estimates; replace them from the step log of a real uninstall.
+// The bar is weighted by time, not by step count, in milliseconds from setup.log. The install
+// weights are each step's median over twelve installs: the shortcut calls (one PowerShell process
+// each) take nearly all of it. The removal weights come from one uninstall that kept the user's
+// data, so deleting the data is untimed; the whole removal took about 22 ms.
 var (
 	InstallSteps = []Step{{"Unpacking WebVigil", 76}, {"Registering with Windows", 11}, {"Creating shortcuts", 1680}, {"Applying settings", 0}}
-	RemoveSteps  = []Step{{"Removing shortcuts", 40}, {"Removing registry entries", 10}, {"Removing your data", 20}, {"Removing program files", 30}}
+	RemoveSteps  = []Step{{"Removing shortcuts", 7}, {"Removing registry entries", 1}, {"Removing your data", 0}, {"Removing program files", 14}}
 )
 
 // Progress returns the bar position, in percent, once steps before done have finished.
