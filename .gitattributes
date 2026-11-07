@@ -1,2 +1,4 @@
 # Shell scripts run on macOS and Linux; keep them LF regardless of the Windows checkout's core.autocrlf.
 *.sh text eol=lf
+# gofmt rejects CRLF, so Go source stays LF whatever core.autocrlf says (the gate runs gofmt -l).
+*.go text eol=lf
