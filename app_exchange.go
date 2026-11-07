@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	goruntime "runtime"
 	"strings"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -12,12 +13,6 @@ import (
 
 // historyLimit is how many checks and changes the details panel shows.
 const historyLimit = 200
-
-// exchangeFilter offers the WebVigil sites format in the file dialogs.
-var exchangeFilter = []runtime.FileFilter{
-	{DisplayName: "WebVigil sites (*" + domain.ExchangeExtension + ")", Pattern: "*" + domain.ExchangeExtension},
-	{DisplayName: "JSON files (*.json)", Pattern: "*.json"},
-}
 
 // History returns a site's recent checks and changes.
 func (a *App) History(id int64) (HistoryDTO, error) {
@@ -74,7 +69,7 @@ func (a *App) ExportSites(ids []int64) (ExportResultDTO, error) {
 		return ExportResultDTO{}, err
 	}
 	path, err := runtime.SaveFileDialog(a.ctx, runtime.SaveDialogOptions{
-		Title: "Export sites", DefaultFilename: "sites" + domain.ExchangeExtension, Filters: exchangeFilter,
+		Title: "Export sites", DefaultFilename: "sites" + domain.ExchangeExtension, Filters: exchangeFilters(goruntime.GOOS),
 	})
 	if err != nil || path == "" {
 		return ExportResultDTO{}, err
@@ -97,7 +92,7 @@ func (a *App) PreviewImport() (ImportPreviewDTO, error) {
 	if err != nil {
 		return ImportPreviewDTO{}, err
 	}
-	path, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{Title: "Import sites", Filters: exchangeFilter})
+	path, err := runtime.OpenFileDialog(a.ctx, runtime.OpenDialogOptions{Title: "Import sites", Filters: exchangeFilters(goruntime.GOOS)})
 	if err != nil || path == "" {
 		return ImportPreviewDTO{}, err
 	}
