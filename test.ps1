@@ -22,7 +22,10 @@ function Step($name, [scriptblock]$body) {
 }
 
 Step 'gofmt' {
-    $unformatted = gofmt -l internal tests tools installer main.go app.go app_exchange.go dto.go notify.go
+    # Every root .go file by pattern, so a new facade file or test is checked without being listed;
+    # the folders by name, which keeps frontend/node_modules (it ships Go of its own) out.
+    $rootGo = (Get-ChildItem -Path $root -Filter '*.go' -File).FullName
+    $unformatted = gofmt -l internal tests tools installer $rootGo
     if ($unformatted) { Write-Host $unformatted; $global:LASTEXITCODE = 1 } else { $global:LASTEXITCODE = 0 }
 }
 Step 'go vet' { go vet ./... }
