@@ -130,8 +130,9 @@ opening WebVigil when setup finishes (ticked).
 Running setup again offers Update, Go back or Repair, depending on the version
 already installed, with Uninstall beside each. Modify in the Apps list opens
 the same program. Uninstall removes the program, its shortcuts, its sign-in
-entry and its notification registration; your websites and history are kept
-unless you tick the box to delete them too.
+entry, its notification registration and setup's own browser profile; your
+websites and history are kept unless you tick the box to delete them too, which
+also removes the window's browser profile.
 
 ## Where it keeps things
 

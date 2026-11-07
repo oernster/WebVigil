@@ -22,6 +22,9 @@ wails dev
 The version reads `0.0.0-dev` and the update check reports every check as
 unreachable, since no release repository is stamped in. The data folder is the
 same one an installed copy uses (see README), so a dev run shares its sites.
+The exception is a run started from inside a packaged (MSIX) Windows app, such as
+the Claude desktop app: Windows gives it that app's private copy of AppData, so
+it reads and writes there instead.
 
 ## Project layout
 

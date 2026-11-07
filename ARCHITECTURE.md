@@ -21,6 +21,7 @@ Dependencies point inward. Each rule below is held by a test in
 | Only package `main` at the root imports both application and infrastructure | `TestCompositionRootIsWhitelisted` |
 | Only `fetch` and `update` import a package that opens a connection; elsewhere `net/http` may be used for its status names alone | `TestOnlyTheListedPackagesReachTheNetwork`, `TestEveryNetworkExemptionExists` |
 | The page makes no request of its own: no `fetch`, `XMLHttpRequest`, `WebSocket`, `EventSource` or `sendBeacon` in `frontend/src` | `TestTheFrontEndMakesNoRequestOfItsOwn` |
+| The setup page names the product only from the state Go sends it | `TestTheSetupPageNamesNoProduct` |
 
 ## Layers
 
@@ -41,8 +42,9 @@ Dependencies point inward. Each rule below is held by a test in
   `setup` (the Windows setup program's install logic).
 - **UI**: the Wails facade in package `main` (`app.go`, `app_exchange.go`,
   `about.go`, `closing.go`, `exchange_filter.go`, `notify.go` and `dto.go`)
-  plus the React page in
-  `frontend/src`. The facade maps DTOs and holds no rules. On the page,
+  plus the React page in `frontend/src`. The facade maps DTOs; its only rules
+  concern the window itself: when the close button asks (`closing.go`) and the
+  file-dialog filters macOS can accept (`exchange_filter.go`). On the page,
   `api.ts` is the only file that reaches Go; `logic.ts`, `platform.ts`,
   `reading.ts` and `autoScroll.ts` are pure.
 

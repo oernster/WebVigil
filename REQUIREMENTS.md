@@ -297,9 +297,8 @@ mode with the product's title (required), author, formats and prices, rating,
 review count, description, cover and details, exclude the sales rank and the
 repeated rating from the details and say so beside the detection mode; on an
 existing definition the note shall add that the fields are not in use until it
-is saved. The
-fields shall stay editable; an address shall be filled in once, so a user who
-returns it to text mode keeps text mode. Measured on two live book pages: the
+is saved. The fields shall stay editable; an address shall be filled in once, so
+a user who returns it to text mode keeps text mode. Measured on two live book pages: the
 visible text differed on each of three fetches and the fields did not.
 Verified by: `internal/domain/reading_test.go`,
 `internal/infrastructure/extract/reading_test.go`, `reading_test.go`,
@@ -432,8 +431,9 @@ Verified by: `internal/infrastructure/storage/history_test.go::TestRecordCheckWr
 lines; in field mode it shall list fields whose value changed.
 Verified by: `internal/domain/diff_test.go`
 
-**FR-103 Retention.** After each check, the storage layer shall keep the newest
-1,000 checks and newest 50 snapshots per site, never deleting the baseline
+**FR-103 Retention.** After each check, the storage layer shall keep per site the
+newest 1,000 checks, every unacknowledged change event plus any acknowledged one
+among the newest 50 and the newest 50 snapshots, never deleting the baseline
 snapshot or one referenced by a change event still held.
 Verified by: `internal/infrastructure/storage/history_test.go::TestRetention`
 
@@ -504,11 +504,18 @@ Verified by: `internal/infrastructure/setup/setup_test.go` (the install paths,
 the routes and the payload fence); the registry writes, the running-app check
 and the screens by hand.
 
-**FR-134 Uninstall.** Uninstall shall remove the program, its shortcuts and its
-registration. With the option to delete the user's data ticked, it shall also
-remove the data folder and the window's browser profile
-(`%APPDATA%\WebVigil.exe`).
-Verified by: `internal/infrastructure/setup/setup_test.go::TestRemoveDataRemovesTheProfileToo`
+**FR-134 Uninstall.** Uninstall shall remove the program, its shortcuts, its
+registration and the setup program's own browser profile, the last once setup
+has exited.
+With the option to delete the user's data ticked, it shall also remove the data
+folder and the window's browser profile (`%APPDATA%\WebVigil.exe`).
+Verified by: `internal/infrastructure/setup/setup_test.go`
+(`TestRemoveDataRemovesTheProfileToo`, `TestRemovalWaitsThenRemovesEveryFolder`,
+`TestSetupProfileFollowsTheRunningExecutable`); the removal after exit by hand.
+
+**FR-135 Name from state.** The setup page shall name the product only from the
+state the setup program sends it.
+Verified by: `tests/structural/setup_page_test.go::TestTheSetupPageNamesNoProduct`
 
 ### 3.14 Help
 
@@ -559,8 +566,9 @@ Verified by: `tests/structural/focus_test.go`
 
 **NFR-SEC-001** The application shall send no network request other than the
 checks the user configured and the release query of FR-144, which carries no
-identifier and nothing about the user's sites. Verified by inspection of every
-`http` client use; the release query by
+identifier and nothing about the user's sites. Verified by
+`tests/structural/network_test.go` (only the fetcher and the update check may
+open a connection; the page makes no request of its own) and the release query by
 `internal/infrastructure/update/github_test.go::TestTheRequestTargetsTheLatestReleaseEndpointAsJSON`.
 
 **NFR-SEC-002** The interface shall render fetched content as text only, never as
@@ -572,7 +580,9 @@ coverage, gated in `test.ps1`.
 **NFR-MNT-002** The layering `UI → Application → Domain ← Infrastructure` shall
 be enforced by `tests/structural`.
 
-**NFR-MNT-003** No Go or TypeScript source file shall exceed 400 lines.
+**NFR-MNT-003** No Go or TypeScript source file shall exceed 400 lines or sit in
+the band above 380; the icon generator is exempt as a build tool. Verified by
+`tests/structural/structural_test.go::TestModuleSize`.
 
 **NFR-PRV-001** All data shall stay on the user's machine. WebVigil's own
 database and run log live in its per-user data folder: `%LOCALAPPDATA%\WebVigil`
