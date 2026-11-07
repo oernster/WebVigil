@@ -60,7 +60,7 @@
 
     <div class="wrap hero">
         <p class="eyebrow">
-            <span class="pill">v<!--VERSION-->1.0.0<!--/VERSION--></span>
+            <span class="pill">v<!--VERSION-->1.0.1<!--/VERSION--></span>
             <span class="pill">Windows, macOS, Linux</span>
             <span class="pill">Free and open source</span>
         </p>
@@ -148,6 +148,10 @@
                     <li><strong>Ignores what does not matter.</strong> Excluded selectors and
                         text patterns are removed before comparison; whitespace can be collapsed
                         and case folded.</li>
+                    <li><strong>Knows Amazon product pages.</strong> Amazon reshuffles adverts
+                        and menus on every load. An Amazon product address fills in the title,
+                        author, prices, rating, reviews, description, cover and details as fields,
+                        so only the product itself can raise an alarm.</li>
                     <li><strong>Checks politely.</strong> At most four checks at once, one host
                         never asked twice within ten seconds, conditional requests when nothing
                         changed and a back-off of up to a day while a site keeps failing (or its
@@ -187,7 +191,7 @@
     <section class="wrap" id="download">
         <p class="kicker">Download</p>
         <h2>Install it once. Stop refreshing.</h2>
-        <span class="dl-version" id="dl-version">Version <!--VERSION-->1.0.0<!--/VERSION--></span>
+        <span class="dl-version" id="dl-version">Version <!--VERSION-->1.0.1<!--/VERSION--></span>
         <!--
             Each button points at GitHub's releases/latest/download redirect, which always
             serves the newest release's file. The name carries no version, so the link

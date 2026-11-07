@@ -46,6 +46,13 @@ Site: [ernster.dev/WebVigil](https://ernster.dev/WebVigil/)
   extraction shows exactly what will be compared before you save.
 - **Ignores what does not matter.** Excluded selectors and text patterns are
   removed before comparison; whitespace can be collapsed and case folded.
+- **Knows Amazon product pages.** Amazon reshuffles adverts, menus and page data
+  on every load, so the whole page never reads the same twice. Enter an Amazon
+  product address and the dialog fills in fields for the title, author, formats
+  and prices, rating, review count, description, cover and product details
+  (without the sales rank, which moves by the hour). They stay visible and
+  editable; a robot-check page served in place of the product reads as a failed
+  check, not a change.
 - **Compares deterministically.** The content is normalised and hashed; a
   different hash is a change. The first successful check is the baseline and
   raises nothing. Seeing the same changed content again raises nothing more,

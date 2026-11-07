@@ -4,7 +4,7 @@
 // an answer.
 import type {
   AboutDTO, AppStateDTO, ChangeDetailDTO, ExportResultDTO, HistoryDTO, ImportPreviewDTO, ImportSummaryDTO,
-  PreviewDTO, SettingsDTO, SiteDTO, SiteFormDTO, UpdateStatusDTO,
+  PreviewDTO, ReadingDTO, SettingsDTO, SiteDTO, SiteFormDTO, UpdateStatusDTO,
 } from './wire'
 
 export type Refused = (message: string) => void
@@ -48,6 +48,7 @@ export const api = {
   state: (r: Refused) => call<AppStateDTO>('State', [], r),
   listSites: (r: Refused) => call<SiteDTO[]>('ListSites', [], r),
   newSiteForm: (r: Refused) => call<SiteFormDTO>('NewSiteForm', [], r),
+  suggestedReading: (url: string, r: Refused) => call<ReadingDTO>('SuggestedReading', [url], r),
   getSite: (id: number, r: Refused) => call<SiteFormDTO>('GetSite', [id], r),
   addSite: (f: SiteFormDTO, allowDuplicate: boolean, r: Refused) => call<number>('AddSite', [f, allowDuplicate], r),
   updateSite: (f: SiteFormDTO, rebaseline: boolean, allowDuplicate: boolean, r: Refused) =>

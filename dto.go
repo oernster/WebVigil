@@ -171,6 +171,25 @@ type FieldValueDTO struct {
 	Value string `json:"value"`
 }
 
+// ReadingDTO is a ready-made reading the site dialog fills a definition in from.
+type ReadingDTO struct {
+	Found            bool           `json:"found"`
+	Name             string         `json:"name"`
+	Mode             string         `json:"mode"`
+	Fields           []FieldRuleDTO `json:"fields"`
+	ExcludeSelectors []string       `json:"excludeSelectors"`
+	ExcludePatterns  []string       `json:"excludePatterns"`
+}
+
+func readingDTO(r domain.Reading) ReadingDTO {
+	out := ReadingDTO{Found: true, Name: r.Name, Mode: string(r.Mode), Fields: []FieldRuleDTO{},
+		ExcludeSelectors: orEmpty(r.ExcludeSelectors), ExcludePatterns: orEmpty(r.ExcludePatterns)}
+	for _, f := range r.Fields {
+		out.Fields = append(out.Fields, FieldRuleDTO(f))
+	}
+	return out
+}
+
 // PreviewDTO is a one-off extraction shown while editing.
 type PreviewDTO struct {
 	HTTPStatus int             `json:"httpStatus"`

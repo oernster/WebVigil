@@ -290,6 +290,19 @@ service shall fetch and extract once with the unsaved settings and show the
 normalised content without storing anything.
 Verified by: `internal/application/check_test.go::TestPreviewStoresNothing`
 
+**FR-058 Ready-made readings.** When the address in the Add or Edit dialog is an
+Amazon product page (`/dp/<ASIN>` or `/gp/product/<ASIN>` on any Amazon
+storefront) and the definition is in text mode, the dialog shall fill in field
+mode with the product's title (required), author, formats and prices, rating,
+review count, description, cover and details, exclude the sales rank and the
+repeated rating from the details and say so beside the detection mode. The
+fields shall stay editable; an address shall be filled in once, so a user who
+returns it to text mode keeps text mode. Measured on two live book pages: the
+visible text differed on each of three fetches and the fields did not.
+Verified by: `internal/domain/reading_test.go`,
+`internal/infrastructure/extract/reading_test.go`, `reading_test.go`,
+`frontend/src/reading.test.ts` and `frontend/src/components/SiteDialog.test.tsx`
+
 ### 3.6 Change detection
 
 **FR-060 First success is a baseline.** When a site without a baseline is

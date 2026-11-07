@@ -30,6 +30,17 @@ export interface FieldRuleDTO {
   optional: boolean
 }
 
+// ReadingDTO is a ready-made way to read one kind of page (FR-058); found is false when the
+// address has none.
+export interface ReadingDTO {
+  found: boolean
+  name: string
+  mode: string
+  fields: FieldRuleDTO[]
+  excludeSelectors: string[]
+  excludePatterns: string[]
+}
+
 export interface SiteFormDTO {
   id: number
   name: string

@@ -1,7 +1,8 @@
-import {useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import {api} from '../api'
 import {icons} from '../icons'
 import {intervalPresets, lines, patternLines} from '../logic'
+import {DEFAULT_MODE, filledForm, mergeLines, readingNote} from '../reading'
 import type {FieldRuleDTO, PreviewDTO, SiteFormDTO} from '../wire'
 import {Modal} from './Modal'
 
@@ -35,8 +36,28 @@ export function SiteDialog({initial, onSaved, onCancel}: Props) {
   const [ask, setAsk] = useState<Ask>(null)
   const [busy, setBusy] = useState(false)
   const [preview, setPreview] = useState<PreviewDTO | null>(null)
+  const [filledFrom, setFilledFrom] = useState('')
+  const filledFor = useRef('')
   const editing = initial.id !== 0
   const set = <K extends keyof SiteFormDTO>(k: K, v: SiteFormDTO[K]) => setF((o) => ({...o, [k]: v}))
+  // A page WebVigil has a ready-made reading for is filled in from it as its address is entered
+  // or when its definition opens, while the definition is still in the default mode (FR-058). An
+  // answer for an address the user has since changed is dropped. An address is filled in once:
+  // a user who moves it back to text mode keeps text mode.
+  useEffect(() => {
+    if (f.mode !== DEFAULT_MODE || f.url === filledFor.current) return
+    let live = true
+    void api.suggestedReading(f.url, () => undefined).then((reading) => {
+      if (!live || !reading?.found) return
+      filledFor.current = f.url
+      setF((o) => filledForm(o, reading))
+      setExcludeSel((t) => mergeLines(t, reading.excludeSelectors))
+      setExcludePat((t) => mergeLines(t, reading.excludePatterns))
+      setFilledFrom(reading.name)
+    })
+    return () => { live = false }
+  }, [f.url, f.mode])
+
   const form = (): SiteFormDTO => ({...f, selectors: lines(selectors), excludeSelectors: lines(excludeSel), excludePatterns: patternLines(excludePat)})
 
   const save = async (allowDuplicate: boolean, rebaseline: boolean) => {
@@ -95,6 +116,7 @@ export function SiteDialog({initial, onSaved, onCancel}: Props) {
         <select id="f-mode" value={f.mode} onChange={(e) => set('mode', e.target.value)}>
           {MODES.map(([v, t]) => <option key={v} value={v}>{t}</option>)}
         </select>
+        {filledFrom && f.mode === 'structured_fields' && <p className="hint">{readingNote(filledFrom)}</p>}
         {f.mode === 'css_selector' && <>
           <label htmlFor="f-sel">CSS selectors</label>
           <textarea id="f-sel" value={selectors} onChange={(e) => setSelectors(e.target.value)} placeholder="One per line; each must match" />

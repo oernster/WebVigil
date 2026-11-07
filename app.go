@@ -156,6 +156,16 @@ func (a *App) ListSites() ([]SiteDTO, error) {
 // NewSiteForm returns a blank definition carrying every default.
 func (a *App) NewSiteForm() SiteFormDTO { return formDTO(domain.NewSite("", "")) }
 
+// SuggestedReading returns the ready-made reading for url, which the site dialog fills in; Found
+// is false when there is none for that page (FR-058).
+func (a *App) SuggestedReading(url string) ReadingDTO {
+	r, ok := domain.ReadingFor(url)
+	if !ok {
+		return ReadingDTO{Fields: []FieldRuleDTO{}, ExcludeSelectors: []string{}, ExcludePatterns: []string{}}
+	}
+	return readingDTO(r)
+}
+
 // GetSite returns one definition for the Edit dialog.
 func (a *App) GetSite(id int64) (SiteFormDTO, error) {
 	svc, err := a.ready()

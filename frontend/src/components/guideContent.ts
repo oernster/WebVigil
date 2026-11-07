@@ -43,7 +43,7 @@ export function guideSections(platform: string): GuideSection[] {
       heading: 'The bar along the top',
       intro: 'The controls read left to right: adding and changing a site, then import and export, then monitoring. Settings, the appearance toggle and Help are held at the far end. Hover any of them to see its name.',
       entries: [
-        {icon: icons.addSite, name: 'Add website', text: 'a new page to watch: its address, how often to check it and what counts as a change. Preview extraction shows what WebVigil will compare before you save.'},
+        {icon: icons.addSite, name: 'Add website', text: 'a new page to watch: its address, how often to check it and what counts as a change. Preview extraction shows what WebVigil will compare before you save. An Amazon product address fills in the product\'s own fields for you, so the adverts Amazon changes on every visit are ignored.'},
         {icon: icons.editSite, name: 'Edit', text: 'changes the website selected in the list. Disabled until a site is selected.'},
         {icon: icons.deleteSite, name: 'Delete', text: 'removes the selected website and its history once you confirm; disabling it instead keeps everything. Disabled until a site is selected.'},
         {icon: icons.importSites, name: 'Import sites', text: 'reads a file of site definitions and shows each one first; a site you already watch is skipped unless you choose otherwise.'},
