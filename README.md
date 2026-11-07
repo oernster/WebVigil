@@ -183,7 +183,11 @@ removes the Flatpak build files. Neither script runs the gate, which is the
 Windows build's.
 
 [REQUIREMENTS.md](REQUIREMENTS.md) is the specification: every requirement with
-the test or check that verifies it.
+the test or check that verifies it. [ARCHITECTURE.md](ARCHITECTURE.md),
+[TESTING.md](TESTING.md), [DEVELOPMENT.md](DEVELOPMENT.md),
+[DECISIONS-TRADEOFFS.md](DECISIONS-TRADEOFFS.md) and
+[TECH_DEBT.md](TECH_DEBT.md) cover the design, the tests, working on the source,
+the choices behind it and the debt still open.
 
 ## Supporting the project
 
