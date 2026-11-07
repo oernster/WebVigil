@@ -458,9 +458,11 @@ write its one entry: on Windows `HKCU\...\Run\WebVigil` with the quoted path and
 `-hidden`, so it waits in the tray; on macOS a LaunchAgent in
 `~/Library/LaunchAgents`; on Linux an XDG autostart entry (inside the Flatpak,
 one that runs the installed app). Off Windows it opens the window. Turned off,
-it shall remove the entry.
-Verified by: `internal/infrastructure/autostart/autostart_windows_test.go` and
-`internal/infrastructure/autostart/entry_test.go`
+it shall remove the entry. Settings shall show whether the entry is there,
+whoever wrote it: the setup program writes the same entry.
+Verified by: `internal/infrastructure/autostart/autostart_windows_test.go`,
+`internal/infrastructure/autostart/entry_test.go` and
+`internal/application/settings_test.go::TestSettingsTakeTheSignInChoiceFromTheEntry`
 
 **FR-113 Restart.** After a restart the application shall hold the same sites,
 baselines, pending alerts and settings.
@@ -501,6 +503,12 @@ would land outside the install folder.
 Verified by: `internal/infrastructure/setup/setup_test.go` (the install paths,
 the routes and the payload fence); the registry writes, the running-app check
 and the screens by hand.
+
+**FR-134 Uninstall.** Uninstall shall remove the program, its shortcuts and its
+registration. With the option to delete the user's data ticked, it shall also
+remove the data folder and the window's browser profile
+(`%APPDATA%\WebVigil.exe`).
+Verified by: `internal/infrastructure/setup/setup_test.go::TestRemoveDataRemovesTheProfileToo`
 
 ### 3.14 Help
 

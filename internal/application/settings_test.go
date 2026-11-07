@@ -9,9 +9,13 @@ import (
 )
 
 type fakeAutoStart struct {
-	set []bool
-	err error
+	set     []bool
+	err     error
+	on      bool  // what Enabled reports
+	readErr error // why Enabled cannot tell
 }
+
+func (f *fakeAutoStart) Enabled() (bool, error) { return f.on, f.readErr }
 
 func (f *fakeAutoStart) Set(enabled bool) error {
 	if f.err != nil {
@@ -19,6 +23,33 @@ func (f *fakeAutoStart) Set(enabled bool) error {
 	}
 	f.set = append(f.set, enabled)
 	return nil
+}
+
+// TestSettingsTakeTheSignInChoiceFromTheEntry: setup writes the sign-in entry without touching the
+// stored settings, so the entry decides what Settings shows; an unreadable one leaves the stored
+// choice.
+func TestSettingsTakeTheSignInChoiceFromTheEntry(t *testing.T) {
+	t.Parallel()
+	for _, c := range []struct {
+		name          string
+		stored, entry bool
+		readErr       error
+		want          bool
+	}{
+		{"setup wrote the entry", false, true, nil, true},
+		{"the entry was removed", true, false, nil, false},
+		{"the entry cannot be read", true, false, errBoom, true},
+	} {
+		store := newMemStore()
+		store.settings.StartAtSignIn = c.stored
+		s, err := NewSettings(bg, store, &fakeAutoStart{on: c.entry, readErr: c.readErr}, &eventLog{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got := s.Current().StartAtSignIn; got != c.want {
+			t.Errorf("%s: StartAtSignIn = %v, want %v", c.name, got, c.want)
+		}
+	}
 }
 
 func TestThemePersists(t *testing.T) {

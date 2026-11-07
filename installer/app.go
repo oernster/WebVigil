@@ -125,11 +125,7 @@ func (a *App) Uninstall(removeData bool) error {
 			if !removeData {
 				return nil
 			}
-			data, err := setup.DataDir()
-			if err != nil {
-				return err
-			}
-			return os.RemoveAll(data)
+			return setup.RemoveData()
 		},
 		func() error { return setup.ScheduleRemoval(dir) },
 	}

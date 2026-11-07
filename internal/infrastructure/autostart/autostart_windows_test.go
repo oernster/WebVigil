@@ -18,8 +18,14 @@ func TestSetWritesAndRemovesEntry(t *testing.T) {
 		_ = registry.DeleteKey(registry.CURRENT_USER, scratchKey)
 		_ = registry.DeleteKey(registry.CURRENT_USER, `Software\WebVigilTest`)
 	})
+	if on, err := r.Enabled(); err != nil || on {
+		t.Fatalf("before any entry: Enabled = %v, %v", on, err)
+	}
 	if err := r.Set(true); err != nil {
 		t.Fatal(err)
+	}
+	if on, err := r.Enabled(); err != nil || !on {
+		t.Errorf("after Set(true): Enabled = %v, %v", on, err)
 	}
 	key, err := registry.OpenKey(registry.CURRENT_USER, scratchKey, registry.QUERY_VALUE)
 	if err != nil {
@@ -35,6 +41,9 @@ func TestSetWritesAndRemovesEntry(t *testing.T) {
 	}
 	if err := r.Set(false); err != nil {
 		t.Errorf("removing an absent entry: %v", err)
+	}
+	if on, err := r.Enabled(); err != nil || on {
+		t.Errorf("key without the value: Enabled = %v, %v", on, err)
 	}
 	key, _ = registry.OpenKey(registry.CURRENT_USER, scratchKey, registry.QUERY_VALUE)
 	if _, _, err := key.GetStringValue(ValueName); !errors.Is(err, registry.ErrNotExist) {

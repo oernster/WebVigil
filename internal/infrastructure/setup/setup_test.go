@@ -76,6 +76,42 @@ func TestDirsFollowLocalAppData(t *testing.T) {
 	}
 }
 
+// TestRemoveDataRemovesTheProfileToo: deleting the user's data takes the window's WebView2 profile
+// with the data folder; both environment folders point at scratch space, never the real ones.
+func TestRemoveDataRemovesTheProfileToo(t *testing.T) {
+	local, roaming := t.TempDir(), t.TempDir()
+	t.Setenv("LOCALAPPDATA", local)
+	t.Setenv("APPDATA", roaming)
+	data, profile := filepath.Join(local, AppName), filepath.Join(roaming, ExeName)
+	for _, d := range []string{data, profile} {
+		if err := os.MkdirAll(filepath.Join(d, "inner"), 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if got, _ := ProfileDir(); got != profile {
+		t.Errorf("ProfileDir = %s, want %s", got, profile)
+	}
+	if err := RemoveData(); err != nil {
+		t.Fatal(err)
+	}
+	for _, d := range []string{data, profile} {
+		if _, err := os.Stat(d); !os.IsNotExist(err) {
+			t.Errorf("%s survived: %v", d, err)
+		}
+	}
+	if err := RemoveData(); err != nil {
+		t.Errorf("removing folders already gone: %v", err)
+	}
+	t.Setenv("APPDATA", "")
+	if err := RemoveData(); err == nil {
+		t.Error("no APPDATA was accepted")
+	}
+	t.Setenv("LOCALAPPDATA", "")
+	if err := RemoveData(); err == nil {
+		t.Error("no LOCALAPPDATA was accepted")
+	}
+}
+
 func TestCompareVersions(t *testing.T) {
 	cases := []struct {
 		a, b string
@@ -114,7 +150,11 @@ func TestProgress(t *testing.T) {
 	if Progress(InstallSteps, 0) != 0 || Progress(InstallSteps, len(InstallSteps)) != 100 || Progress(nil, 0) != 0 {
 		t.Error("progress ends wrong")
 	}
-	if Progress(InstallSteps, 1) != 45 {
-		t.Errorf("weighted progress = %d", Progress(InstallSteps, 1))
+	// Weighted by measured time: the bar barely moves until the shortcuts, which take nearly all of it.
+	if p := Progress(InstallSteps, 2); p >= 10 {
+		t.Errorf("progress before the shortcuts = %d, want under 10", p)
+	}
+	if p := Progress(InstallSteps, 3); p != 100 {
+		t.Errorf("progress after the shortcuts = %d, want 100", p)
 	}
 }

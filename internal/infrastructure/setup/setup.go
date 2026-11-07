@@ -56,6 +56,31 @@ func DataDir() (string, error) {
 	return filepath.Join(base, AppName), nil
 }
 
+// ProfileDir is %APPDATA%\WebVigil.exe: the window's WebView2 profile, which takes the executable's
+// name. It holds the page's own storage, a skipped update version among it.
+func ProfileDir() (string, error) {
+	base := os.Getenv("APPDATA")
+	if base == "" {
+		return "", fmt.Errorf("APPDATA is not set")
+	}
+	return filepath.Join(base, ExeName), nil
+}
+
+// RemoveData deletes everything WebVigil keeps about the user: the data folder and the window's
+// profile. A folder already gone is not an error.
+func RemoveData() error {
+	for _, dir := range []func() (string, error){DataDir, ProfileDir} {
+		d, err := dir()
+		if err != nil {
+			return err
+		}
+		if err := os.RemoveAll(d); err != nil {
+			return fmt.Errorf("remove %s: %w", d, err)
+		}
+	}
+	return nil
+}
+
 // ExtractZip unpacks the payload into dest. Every entry is checked against dest BEFORE any file
 // is written, so a crafted archive that would climb out of the install folder writes nothing.
 func ExtractZip(data []byte, dest string) error {

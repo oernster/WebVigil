@@ -16,8 +16,14 @@ func TestEntryWritesRewritesAndRemoves(t *testing.T) {
 	if err := e.Set(false); err != nil {
 		t.Fatalf("removing an absent entry: %v", err)
 	}
+	if on, err := e.Enabled(); err != nil || on {
+		t.Fatalf("before any entry: Enabled = %v, %v", on, err)
+	}
 	if err := e.Set(true); err != nil {
 		t.Fatal(err)
+	}
+	if on, err := e.Enabled(); err != nil || !on {
+		t.Fatalf("after Set(true): Enabled = %v, %v", on, err)
 	}
 	text = "second"
 	if err := e.Set(true); err != nil {
@@ -38,6 +44,9 @@ func TestEntryReportsWhyItCannotBeWritten(t *testing.T) {
 	want := errors.New("no home folder")
 	if err := (Entry{err: want}).Set(true); !errors.Is(err, want) {
 		t.Fatalf("Set = %v, want %v", err, want)
+	}
+	if _, err := (Entry{err: want}).Enabled(); !errors.Is(err, want) {
+		t.Fatalf("Enabled = %v, want %v", err, want)
 	}
 	failing := Entry{path: filepath.Join(t.TempDir(), "x"), content: func() (string, error) { return "", want }}
 	if err := failing.Set(true); !errors.Is(err, want) {

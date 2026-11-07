@@ -62,11 +62,12 @@ type Step struct {
 	Weight int    `json:"weight"`
 }
 
-// The bar is weighted by time, not by step count: unpacking the payload and the shortcut calls
-// (one PowerShell process each) dominate while the registry writes are near instant. These are
-// starting estimates, to be replaced by the timings in a real install's step log.
+// The bar is weighted by time, not by step count. The install weights are each step's median
+// time in milliseconds over twelve installs recorded in setup.log: the shortcut calls (one
+// PowerShell process each) take nearly all of it. No removal has been timed yet, so its weights
+// are still estimates; replace them from the step log of a real uninstall.
 var (
-	InstallSteps = []Step{{"Unpacking WebVigil", 45}, {"Registering with Windows", 5}, {"Creating shortcuts", 45}, {"Applying settings", 5}}
+	InstallSteps = []Step{{"Unpacking WebVigil", 76}, {"Registering with Windows", 11}, {"Creating shortcuts", 1680}, {"Applying settings", 0}}
 	RemoveSteps  = []Step{{"Removing shortcuts", 40}, {"Removing registry entries", 10}, {"Removing your data", 20}, {"Removing program files", 30}}
 )
 

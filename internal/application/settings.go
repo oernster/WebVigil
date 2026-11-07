@@ -16,11 +16,16 @@ type Settings struct {
 	cur       domain.Settings
 }
 
-// NewSettings loads the stored settings.
+// NewSettings loads the stored settings. The sign-in choice is taken from the entry itself when it
+// can be read, since the setup program writes that entry without touching the stored settings; an
+// unreadable entry leaves the stored choice in force (FR-112).
 func NewSettings(ctx context.Context, store SettingsStore, autostart AutoStart, events Events) (*Settings, error) {
 	cur, err := store.LoadSettings(ctx)
 	if err != nil {
 		return nil, err
+	}
+	if on, err := autostart.Enabled(); err == nil {
+		cur.StartAtSignIn = on
 	}
 	return &Settings{storeImpl: store, autostart: autostart, events: events, cur: cur}, nil
 }

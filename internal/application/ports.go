@@ -150,9 +150,11 @@ type Notifier interface {
 	NotifyFailures(n FailureNotice)
 }
 
-// AutoStart controls the sign-in start entry.
+// AutoStart controls the sign-in start entry. Enabled reports whether the entry is there now,
+// whoever wrote it: the setup program writes the same entry.
 type AutoStart interface {
 	Set(enabled bool) error
+	Enabled() (bool, error)
 }
 
 // EventKind names a state change the interface should react to.

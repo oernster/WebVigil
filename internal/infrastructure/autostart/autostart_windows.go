@@ -19,6 +19,25 @@ type Registry struct {
 // New returns the sign-in entry for the running executable.
 func New() Registry { return Registry{keyPath: RunKeyPath, exe: os.Executable} }
 
+// Enabled reports whether the Run value is present.
+func (r Registry) Enabled() (bool, error) {
+	key, err := registry.OpenKey(registry.CURRENT_USER, r.keyPath, registry.QUERY_VALUE)
+	if errors.Is(err, registry.ErrNotExist) {
+		return false, nil
+	}
+	if err != nil {
+		return false, fmt.Errorf("open the sign-in key: %w", err)
+	}
+	defer key.Close()
+	if _, _, err := key.GetStringValue(ValueName); err != nil {
+		if errors.Is(err, registry.ErrNotExist) {
+			return false, nil
+		}
+		return false, fmt.Errorf("read the sign-in entry: %w", err)
+	}
+	return true, nil
+}
+
 // Set writes or removes the entry.
 func (r Registry) Set(enabled bool) error {
 	key, _, err := registry.CreateKey(registry.CURRENT_USER, r.keyPath, registry.SET_VALUE)

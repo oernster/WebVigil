@@ -18,6 +18,21 @@ type Entry struct {
 	err     error // why no entry can be written at all (no home folder)
 }
 
+// Enabled reports whether the entry file is present.
+func (e Entry) Enabled() (bool, error) {
+	if e.err != nil {
+		return false, e.err
+	}
+	_, err := os.Stat(e.path)
+	if errors.Is(err, os.ErrNotExist) {
+		return false, nil
+	}
+	if err != nil {
+		return false, fmt.Errorf("read the sign-in entry: %w", err)
+	}
+	return true, nil
+}
+
 // Set writes the entry or removes it; removing an entry that is not there is not an error.
 func (e Entry) Set(enabled bool) error {
 	if e.err != nil {

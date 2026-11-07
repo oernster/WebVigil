@@ -230,6 +230,30 @@ func isProjectSite(p string) bool {
 	return err == nil && strings.HasPrefix(filepath.ToSlash(rel), "docs/")
 }
 
+// setupPageDir is the setup program's hand-written page. It sits in a folder named dist, which walk
+// skips as build output, yet it is committed source shipped inside WebVigilSetup.exe.
+var setupPageDir = filepath.Join("installer", "frontend", "dist")
+
+// setupPageFiles are the setup page's text files: its markup, styles and scripts.
+func setupPageFiles(t *testing.T) []string {
+	t.Helper()
+	entries, err := os.ReadDir(filepath.Join(root, setupPageDir))
+	if err != nil {
+		t.Fatalf("read the setup page folder: %v", err)
+	}
+	var out []string
+	for _, e := range entries {
+		switch filepath.Ext(e.Name()) {
+		case ".html", ".css", ".js":
+			out = append(out, filepath.Join(root, setupPageDir, e.Name()))
+		}
+	}
+	if len(out) == 0 {
+		t.Fatalf("no setup page files found in %s", setupPageDir)
+	}
+	return out
+}
+
 func TestNoUserSpecificData(t *testing.T) {
 	shipped := walk(t, ".", func(p string) bool {
 		ext := filepath.Ext(p)
@@ -237,6 +261,7 @@ func TestNoUserSpecificData(t *testing.T) {
 		return !test && !isProjectSite(p) && (ext == ".go" || ext == ".ts" || ext == ".tsx" || ext == ".css" || ext == ".html" || ext == ".json") &&
 			!strings.Contains(p, "package-lock")
 	})
+	shipped = append(shipped, setupPageFiles(t)...)
 	for _, f := range shipped {
 		src, _ := os.ReadFile(f)
 		low := strings.ToLower(string(src))
