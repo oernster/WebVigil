@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>What's new in WebVigil: release history</title>
+    <meta name="description" content="WebVigil's release history: Settings showing the real sign-in choice, an uninstall that removes the browser profiles, Amazon product pages without false alarms, macOS and Linux and the first release.">
+    <meta name="theme-color" content="#061229">
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="What's new in WebVigil: release history">
+    <meta property="og:description" content="Settings showing the real sign-in choice, Amazon product pages without false alarms, macOS and Linux and the first release.">
+    <meta property="og:image" content="https://ernster.dev/WebVigil/icon.png">
+    <meta property="og:url" content="https://ernster.dev/WebVigil/whats-new.html">
+    <link rel="canonical" href="https://ernster.dev/WebVigil/whats-new.html">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta property="og:site_name" content="WebVigil">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="256">
+    <meta property="og:image:height" content="256">
+    <meta property="og:image:alt" content="WebVigil app icon">
+    <meta property="og:locale" content="en_GB">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="What's new in WebVigil: release history">
+    <meta name="twitter:description" content="Settings showing the real sign-in choice, Amazon product pages without false alarms, macOS and Linux and the first release.">
+    <meta name="twitter:image" content="https://ernster.dev/WebVigil/icon.png">
+    <meta name="twitter:image:alt" content="WebVigil app icon">
+    <link rel="stylesheet" href="styles.css">
+<script>window.goatcounter = {path: function (p) { return location.host + p }}</script>
+<script data-goatcounter="https://oernster.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+
+<header class="wrap site-head">
+    <a class="brand" href="./"><img src="icon.png" alt="" width="34" height="34"> WebVigil</a>
+    <nav aria-label="Sections">
+        <a href="./#how" class="hide-sm">How it works</a>
+        <a href="./#features" class="hide-sm">Features</a>
+        <a href="whats-new.html" aria-current="page">What's New</a>
+        <a href="./#download">Download</a>
+        <a href="https://github.com/oernster/WebVigil">GitHub</a>
+    </nav>
+</header>
+
+<main id="top">
+
+    <section class="wrap" id="whats-new">
+        <p class="kicker">Changelog</p>
+        <h2>What's new</h2>
+        <div class="prose">
+            <p>Recent releases have taken WebVigil beyond Windows to macOS and Linux, then
+                tightened what it says and does: Amazon product pages that no longer raise
+                false alarms, a Settings screen that shows the real sign-in choice and an
+                uninstall that removes the browser profiles it used to leave behind.</p>
+        </div>
+
+        <div class="changelog">
+
+            <div class="card">
+                <div class="ver-tag">v<!--VERSION-->1.1.0<!--/VERSION--></div>
+                <h3>Settings shows the real sign-in choice</h3>
+                <ul>
+                    <li>When setup turned on start at sign-in, Settings still showed it unticked, since it read WebVigil's own stored choice. Settings now reads the sign-in entry itself on Windows, macOS and Linux, so it shows what will actually happen</li>
+                    <li>Uninstalling with the option to delete your websites, history and settings left the window's browser profile behind. It is now removed with the rest; every uninstall also schedules setup's own browser profile for removal once setup has closed</li>
+                    <li>The setup progress bar is weighted by how long each step really takes, measured over twelve installs and an uninstall</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="ver-tag">v1.0.1</div>
+                <h3>Amazon product pages stop raising false alarms</h3>
+                <ul>
+                    <li>An Amazon product page reshuffles itself on every load, so watching one as text reported a change on nearly every check while the product itself had not moved</li>
+                    <li>Enter an Amazon product address in Add or Edit and WebVigil fills in structured fields for the parts that matter: the title, author, formats and prices, rating, review count, description, cover and product details. The sales rank, which moves by the hour, is left out; every field stays visible and editable</li>
+                    <li>A site you already watch keeps its current reading until you open it and save it. Saving asks to start a new baseline, as any change to what is compared does</li>
+                    <li>If Amazon serves its robot-check page in place of the product, the check reports a failure rather than a change</li>
+                    <li>A Windows build no longer fails its formatting check on Go files last committed from a Mac</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="ver-tag">v1.0.0</div>
+                <h3>WebVigil on macOS and Linux</h3>
+                <ul>
+                    <li>Each release carries one download per platform: a setup program for Windows, a disk image for Macs with Apple Silicon and a Flatpak for Linux</li>
+                    <li>Everything that watches pages works the same on every platform, the update check included; it offers the download for the platform you are on</li>
+                    <li>The alarm plays on all three, the built-in chime and your own WAV file alike. Start at sign-in works on all three too</li>
+                    <li>There is no tray on macOS or Linux, so WebVigil watches while its window is open; closing the window quits</li>
+                    <li>On Windows, closing the window now asks whether to minimise to the tray or quit. If you were editing a site, the settings or an import, it says so and offers Go back first</li>
+                    <li>Settings, the Guide and the appearance choice name the system you are on rather than always saying Windows</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <div class="ver-tag">v0.1.0</div>
+                <h3>The first release</h3>
+                <ul>
+                    <li>WebVigil checks the web pages you choose, tells you when their meaningful content changes and says plainly why a check failed. Everything it records stays on your computer</li>
+                    <li>Each site is read one of four ways: its visible text, chosen CSS selectors, named fields or the raw response. Noise can be set aside; Preview extraction shows what will be compared before you save</li>
+                    <li>The first successful check becomes the baseline. A later check that differs records the change, shows it as a line diff and raises your alarm: a chime or your own WAV file, a Windows notification naming the site or both. A change stays amber until you acknowledge it</li>
+                    <li>A failed check is never shown as an old page. It is named (DNS, a refused or timed-out connection, TLS, the HTTP status and more) and makes no sound; one warning appears once a site has failed as many times in a row as its threshold</li>
+                    <li>Polite by design: each site has its own interval, five minutes at the shortest. At most four checks run at once; one host is never asked twice within ten seconds; repeated failures back off up to a day</li>
+                    <li>Site definitions export to a JSON file and import from one, with a preview first. Nothing is written until you confirm</li>
+                    <li>WebVigil lives in the tray and can start when you sign in to Windows. The appearance is light, dark or following Windows</li>
+                    <li>The Help menu holds a Guide to every control, About, the full licence and Check for Updates. The daily update check carries no identifier and nothing about your sites</li>
+                    <li>A setup program installs WebVigil for your account alone, with no administrator rights. Uninstall keeps your websites and history unless you ask for them to be deleted</li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="cta changelog-more">
+            <a class="btn" href="https://github.com/oernster/WebVigil/releases">View all releases on GitHub</a>
+        </div>
+    </section>
+
+</main>
+
+<footer class="wrap site-foot">
+    <span>&copy; Oliver Ernster. GPL-3.0.
+        <a href="https://ernster.dev/commercial-licensing.html">Commercial licences</a> available.</span>
+    <span><a href="https://github.com/oernster/WebVigil">Source</a> &middot;
+        <a href="https://ernster.dev">ernster.dev</a></span>
+</footer>
+
+</body>
+</html>
